@@ -119,7 +119,7 @@
                     <tr>
                         <td>{{ product.id }}</td>
                         <td>{{ product.name }}</td>
-                        <td>${{ "%.2f"|format(product.price) }}</td>
+                        <td>S/.{{ "%.2f"|format(product.price) }}</td>
                         <td>{{ product.stock }}</td>
                         <td>
                             <button class="view-details-button" data-product-id="{{ product.id }}">Ver Detalles</button>

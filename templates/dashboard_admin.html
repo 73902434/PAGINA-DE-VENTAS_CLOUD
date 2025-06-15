@@ -43,7 +43,7 @@
                     <span>Reportes y Boletas</span>
                 </a>
             </li>
-            
+
         </ul>
         <p style="text-align: center; margin-top: 30px;"><a href="{{ url_for('logout') }}"
                 class="button secondary">Cerrar Sesión</a></p>
@@ -64,7 +64,7 @@
                     <div class="stats-grid">
                         <div class="stat-item">
                             <h3>Ventas de Hoy</h3>
-                           <p>S/. {{ "%.2f"|format(stats.total_sales_today) }}</p>
+                            <p>S/. {{ "%.2f"|format(stats.total_sales_today) }}</p>
                         </div>
                         <div class="stat-item">
                             <h3>Empleados Activos</h3>
@@ -97,27 +97,27 @@
                     <div class="stats-grid"> {# Un nuevo stats-grid para estos tres cuadros #}
                         <div class="stat-item">
                             <h3>Empleado Top Ventas (Hoy)</h3>
-                            <p>{{ stats.get('top_employee_sales', {}).get('name', 'Nadie ha vendido aún') }}</p> {# <---
-                                CORREGIDO AQUÍ #} <p>${{ "%.2f"|format(stats.get('top_employee_sales',
+                            <p>{{ stats.get('top_employee_sales', {}).get('name', 'Nadie ha vendido aún') }}</p>
+                            <p>S/.{{ "%.2f"|format(stats.get('top_employee_sales',
                                 {}).get('total_sales', 0)) }}</p> {# <--- Y CORREGIDO AQUÍ #} </div>
-                                    <div class="stat-item">
-                                        <h3>Empleado Top Ventas (Semana)</h3>
-                                        {# Si aún no tienes top_employee_sales_week en app.py, estos seguirán mostrando
-                                        'N/A' #}
-                                        <p>{{ stats.get('top_employee_sales_week', {}).get('name', 'Nadie ha vendido
-                                            aún') }}</p>
-                                        <p>${{ "%.2f"|format(stats.get('top_employee_sales_week', {}).get('total_sales',
-                                            0)) }}</p>
-                                    </div>
-                                    <div class="stat-item">
-                                        <h3>Empleado Top Ventas (Mes)</h3>
-                                        {# Si aún no tienes top_employee_sales_month en app.py, estos seguirán mostrando
-                                        'N/A' #}
-                                        <p>{{ stats.get('top_employee_sales_month', {}).get('name', 'Nadie ha vendido
-                                            aún') }}</p>
-                                        <p>${{ "%.2f"|format(stats.get('top_employee_sales_month',
-                                            {}).get('total_sales', 0)) }}</p>
-                                    </div>
+                                <div class="stat-item">
+                                    <h3>Empleado Top Ventas (Semana)</h3>
+                                    {# Si aún no tienes top_employee_sales_week en app.py, estos seguirán mostrando
+                                    'N/A' #}
+                                    <p>{{ stats.get('top_employee_sales_week', {}).get('name', 'Nadie ha vendido
+                                        aún') }}</p>
+                                    <p>S/.{{ "%.2f"|format(stats.get('top_employee_sales_week', {}).get('total_sales',
+                                        0)) }}</p>
+                                </div>
+                                <div class="stat-item">
+                                    <h3>Empleado Top Ventas (Mes)</h3>
+                                    {# Si aún no tienes top_employee_sales_month en app.py, estos seguirán mostrando
+                                    'N/A' #}
+                                    <p>{{ stats.get('top_employee_sales_month', {}).get('name', 'Nadie ha vendido
+                                        aún') }}</p>
+                                    <p>S/.{{ "%.2f"|format(stats.get('top_employee_sales_month',
+                                        {}).get('total_sales', 0)) }}</p>
+                                </div>
                         </div>
                     </div>
 

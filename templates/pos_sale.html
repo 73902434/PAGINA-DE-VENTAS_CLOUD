@@ -40,7 +40,6 @@
 
     .form-group {
         margin-bottom: 15px;
-        /* --- ¡AQUÍ ESTÁ LA CORRECCIÓN DE POSICIONAMIENTO! --- */
         position: relative;
         /* Haz que este sea el contenedor de posicionamiento para los resultados */
     }
@@ -156,7 +155,7 @@
                     <tr>
                         <td>{{ product.id }}</td>
                         <td>{{ product.name }}</td>
-                        <td>${{ "%.2f"|format(product.price) }}</td>
+                        <td>S/.{{ "%.2f"|format(product.price) }}</td>
                         <td id="stock-{{ product.id }}">{{ product.stock }}</td>
                         <td>
                             <button class="add-to-cart-button" data-product-id="{{ product.id }}"
@@ -180,7 +179,7 @@
                 <p>Tu carrito está vacío.</p>
             </div>
             <div id="cart-total-display" style="text-align: right; font-weight: bold; margin-top: 10px;">
-                Total: $0.00
+                Total: S/0.00
             </div>
         </div>
 
@@ -411,8 +410,8 @@
                                 <tr>
                                     <td>${item.product_name}</td>
                                     <td>${item.quantity}</td>
-                                    <td>$${item.product_price.toFixed(2)}</td>
-                                    <td>$${subtotal.toFixed(2)}</td>
+                                    <td>S/.${item.product_price.toFixed(2)}</td>
+                                    <td>S/.${subtotal.toFixed(2)}</td>
                                     <td><button type="button" class="button remove-from-cart" data-product-id="${item.product_id}">Eliminar</button></td>
                                 </tr>
                                 `;
@@ -430,7 +429,7 @@
         }
 
         currentSaleDetailsDiv.innerHTML = htmlContent;
-        cartTotalDisplay.textContent = `Total: $${total.toFixed(2)}`;
+        cartTotalDisplay.textContent = `Total: S/.${total.toFixed(2)}`;
         updateFinalizeButtonState(); // Asegura que el botón se actualice cuando el carrito cambie
     }
 
