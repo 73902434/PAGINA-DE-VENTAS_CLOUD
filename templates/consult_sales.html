@@ -1,0 +1,262 @@
+{% extends "dashboard_employee.html" %}
+
+{% block title %}Consultar Ventas - Sistema de Gestión{% endblock %}
+
+{% block extra_css %}
+    {{ super() }} {# Importante para mantener los estilos de dashboard_employee y base #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='empleado_style.css') }}">
+    <style>
+    
+    /* **** ESTILOS MEJORADOS PARA LAS CARDS DE VENTAS **** */
+    .card {
+        border: 1px solid #dcdcdc;
+        border-radius: .75rem;
+        overflow: hidden;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        background-color: #ffffff;
+    }
+
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+        background-color: #007bff;
+        color: white;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        font-weight: 700;
+        font-size: 1.3em;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .card-header h5 {
+        margin-bottom: 0;
+        font-size: 1em;
+        color: inherit;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .card-body p {
+        margin-bottom: .75rem;
+        font-size: 1em;
+        color: #343a40;
+    }
+
+    .card-body strong {
+        color: #212529;
+    }
+
+    .sale-item-detail {
+        font-size: 0.95em;
+        color: #6c757d;
+        padding-top: .6rem;
+        padding-bottom: .6rem;
+        border-bottom: 1px dashed #e9ecef;
+        margin-left: -1.5rem;
+        margin-right: -1.5rem;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .sale-item-detail:last-child {
+        border-bottom: none;
+    }
+
+    .list-group-flush {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .list-group-flush .list-group-item {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .total-amount {
+        font-weight: bold;
+        color: #28a745;
+        font-size: 1.4em;
+        display: block;
+        margin-top: 15px;
+        text-align: right;
+    }
+
+    .card-footer {
+        background-color: #f0f3f5;
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-footer .btn-info {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+        font-size: 0.95em;
+        padding: .5rem 1rem;
+        border-radius: .3rem;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .card-footer .btn-info:hover {
+        background-color: #138496;
+        border-color: #117a8b;
+        box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
+    }
+
+    /* **** ESTILOS SOLICITADOS PARA LOS COLORES ESPECÍFICOS SIN ALTERAR EL LAYOUT **** */
+    .d-flex h2 { /* Esto apunta al h2 'Consultar Ventas' */
+        color: #007bff;
+        font-weight: 700;
+    }
+
+    .d-flex .btn-info { /* Esto apunta al botón 'Volver al Dashboard' */
+        color: #ffffff;
+    }
+
+    .sale-filters .form-label {
+        color: #343a40;
+    }
+
+    .sale-filters .form-control::placeholder {
+        color: #6c757d;
+        opacity: 1;
+    }
+
+    .sale-filters .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .sale-filters .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+    
+    /* --- INICIO DE ESTILOS DEPURACIÓN DRÁSTICA --- */
+    /* Eliminar estos estilos de depuración después de verificar que funciona */
+    .debug-item-marker {
+        background-color: #ffcccc !important; /* Rojo fuerte */
+        border: 2px solid red !important; /* Borde rojo */
+        margin: 5px 0 !important;
+        padding: 10px !important;
+        color: black !important; /* Texto negro */
+        font-size: 1.5em !important; /* Texto grande */
+        font-weight: bold !important;
+        display: block !important; /* Asegura que se vea como un bloque */
+        width: auto !important; /* Asegura que ocupe el ancho necesario */
+        height: auto !important; /* Asegura que tenga altura */
+        opacity: 1 !important; /* No transparente */
+        visibility: visible !important; /* Visible */
+    }
+
+    .debug-no-items-marker {
+        background-color: #a0c8f0 !important; /* Azul claro */
+        color: darkblue !important; /* Texto azul oscuro */
+        font-weight: bold !important;
+        padding: 10px !important;
+        border: 2px solid blue !important;
+        margin: 5px 0 !important;
+        font-size: 1.2em !important;
+    }
+    /* --- FIN DE ESTILOS DEPURACIÓN DRÁSTICA --- */
+
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+    <div class="container"> 
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Consultar Ventas</h2>
+            <a href="{{ url_for('employee_dashboard_view') }}" class="btn btn-info">Volver al Dashboard</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flashes mb-3">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="sale-filters mb-4">
+            <form method="GET" action="{{ url_for('consult_sales_view') }}">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-9">
+                        <label for="query" class="form-label">Buscar Venta (ID, Cliente, Empleado):</label>
+                        <input type="text" class="form-control" id="query" name="query" value="{{ request.args.get('query') or '' }}" placeholder="Buscar por ID de venta, nombre de cliente o nombre de empleado">
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary w-100">Buscar</button>
+                    </div>
+                    <div class="col-12 d-flex justify-content-end mt-2">
+                        <a href="{{ url_for('consult_sales_view') }}" class="btn btn-secondary me-2">Limpiar Búsqueda</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        {% if sales %}
+            <div class="row"> 
+                {% for sale in sales %}
+                    <div class="col-md-6 mb-4"> 
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Venta ID: {{ sale.sale_id }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Fecha:</strong> {{ sale.sale_date | datetimeformat }}</p>
+                                <p><strong>Monto Total:</strong> S/. {{ '%.2f' | format(sale.total_amount) }}</p>
+                                <p><strong>Método de Pago:</strong> {{ sale.payment_method }}</p> {# ADDED THIS LINE #}
+                                <p><strong>Empleado:</strong> {{ sale.employee_first_name }} {{ sale.employee_last_name }} ({{ sale.employee_username }})</p>
+                                <p><strong>Cliente:</strong> {{ sale.client_name }} (DNI: {{ sale.client_dni }})</p>
+                                
+                                {# **** INICIO DE LA SECCIÓN DE ÍTEMS CON CORRECCIÓN CLAVE **** #}
+                                <p class="mb-2"><strong>Ítems Vendidos:</strong></p>
+                                <ul class="list-group list-group-flush">
+                                    {% if sale['items'] %} 
+                                        {% for item in sale['items'] %} {# Y AQUÍ #}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center sale-item-detail">
+                                                {# Quitando los mensajes de depuración para que aparezcan los datos reales #}
+                                                <span>{{ item.product_name }}</span>
+                                                <span>{{ item.quantity }} x S/. {{ '%.2f' | format(item.price_at_sale) }} = S/. {{ '%.2f' | format(item.subtotal) }}</span>
+                                            </li>
+                                        {% endfor %}
+                                    {% else %}
+                                        <li class="list-group-item text-muted">No hay ítems registrados para esta venta.</li>
+                                    {% endif %}
+                                </ul>
+                                {# **** FIN DE LA SECCIÓN DE ÍTEMS CON CORRECCIÓN CLAVE **** #}
+
+                            </div>
+                            <div class="card-footer text-end">
+                                <span class="total-amount">Total Venta: S/. {{ '%.2f' | format(sale.total_amount) }}</span>
+                                <a href="{{ url_for('generate_invoice', sale_id=sale.sale_id) }}" class="btn btn-info btn-sm ms-2">Ver Boleta</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-sales-message">
+                <p>No se encontraron ventas con los criterios de búsqueda actuales.</p>
+                <p>Intenta ajustar tu búsqueda.</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+{% endblock %}

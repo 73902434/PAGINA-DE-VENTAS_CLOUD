@@ -1,0 +1,582 @@
+{# templates/admin_boletas_reports.html #}
+{% extends "base.html" %}
+
+{% block title %}Reportes y Boletas{% endblock %}
+
+{% block extra_css %}
+{# Carga los estilos CSS específicos para empleados y administradores #}
+<link rel="stylesheet" href="{{ url_for('static', filename='empleado_style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='admin_style.css') }}">
+
+<style>
+    /* Estilos específicos para admin_boletas_reports.html */
+
+    /* Contenedor principal de la sección */
+    .abr-container {
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Título de la página */
+    .abr-heading {
+        color: #007bff;
+        margin-bottom: 25px;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    /* Sección de filtro */
+    .abr-filter-section {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+        display: flex;
+        /* Para alinear elementos */
+        align-items: center;
+        gap: 15px;
+        /* Espacio entre elementos */
+        flex-wrap: wrap;
+        /* Para que los elementos se ajusten en pantallas pequeñas */
+    }
+
+    .abr-filter-section label {
+        font-weight: 500;
+        color: #343a40;
+        margin-bottom: 0;
+        /* Eliminar margen inferior del label */
+    }
+
+    .abr-filter-section select {
+        padding: 8px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        font-size: 1em;
+        min-width: 200px;
+        /* Ancho mínimo para el select */
+    }
+
+    .abr-filter-section .abr-btn-apply-filter {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        font-size: 1em;
+    }
+
+    .abr-filter-section .abr-btn-apply-filter:hover {
+        background-color: #0056b3;
+    }
+
+    /* Contenedor de la tabla de reportes */
+    .abr-report-table-container {
+        overflow-x: auto;
+        /* Permite scroll horizontal en tablas grandes */
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Estilos de la tabla */
+    .abr-report-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 0;
+        /* Eliminar margen inferior si lo añade */
+    }
+
+    .abr-report-table th,
+    .abr-report-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #dee2e6;
+        vertical-align: middle;
+    }
+
+    .abr-report-table thead th {
+        background-color: #007bff;
+        color: white;
+        font-weight: 600;
+        white-space: nowrap;
+        /* Evita que el texto del encabezado se rompa */
+    }
+
+    .abr-report-table tbody tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    .abr-report-table tbody tr:hover {
+        background-color: #e9ecef;
+    }
+
+    /* Estilos para las etiquetas de datos en móvil */
+    .abr-report-table td[data-label] {
+        position: relative;
+        padding-left: 100px;
+        /* Espacio para la etiqueta */
+    }
+
+    .abr-report-table td[data-label]::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        width: 80px;
+        /* Ancho fijo para la etiqueta */
+        font-weight: bold;
+        color: #555;
+        text-align: left;
+    }
+
+    /* Estilos de estado */
+    .abr-status-cancelled {
+        color: #dc3545;
+        /* Rojo para anulada */
+        font-weight: bold;
+    }
+
+    .abr-status-active {
+        color: #28a745;
+        /* Verde para activa */
+        font-weight: bold;
+    }
+
+    /* Botones de acción en la tabla */
+    .abr-btn-cancel-sale {
+        background-color: #ffc107;
+        /* Amarillo para anular */
+        color: #343a40;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        white-space: nowrap;
+        /* Evita que el botón se rompa */
+    }
+
+    .abr-btn-cancel-sale:hover {
+        background-color: #e0a800;
+    }
+
+    .abr-btn-cancel-sale[disabled] {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background-color: #6c757d;
+        /* Gris para deshabilitado */
+        color: white;
+    }
+
+    /* Mensaje sin boletas */
+    .abr-no-sales-message {
+        text-align: center;
+        margin-top: 50px;
+        color: #6c757d;
+        font-size: 1.1em;
+        padding: 20px;
+        border: 1px dashed #ced4da;
+        border-radius: 8px;
+        background-color: #f0f3f5;
+    }
+
+    /* Estilos del Modal (se mantienen con prefijos para consistencia) */
+    .abr-modal-overlay {
+        display: none;
+        /* Oculto por defecto */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .abr-modal-content {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        position: relative;
+        text-align: center;
+    }
+
+    .abr-close-button {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 30px;
+        cursor: pointer;
+        color: #6c757d;
+    }
+
+    .abr-modal-content h2 {
+        color: #dc3545;
+        margin-bottom: 20px;
+    }
+
+    .abr-modal-content p {
+        margin-bottom: 20px;
+        line-height: 1.5;
+    }
+
+    .abr-modal-content strong {
+        color: #007bff;
+    }
+
+    .abr-modal-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .abr-btn-confirm-action {
+        background-color: #dc3545;
+        /* Rojo para confirmar anulación */
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .abr-btn-confirm-action:hover {
+        background-color: #c82333;
+    }
+
+    .abr-btn-cancel-modal {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .abr-btn-cancel-modal:hover {
+        background-color: #5a6268;
+    }
+
+    /* --- ¡¡¡AÑADE ESTOS ESTILOS PARA EL BOTÓN "VER BOLETA"!!! --- */
+    .abr-btn-view-invoice {
+        background-color: #007bff; /* Un color azul, similar a otros botones principales */
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        text-decoration: none; /* Quitar subrayado del enlace */
+        display: inline-block; /* Para que padding y margin funcionen bien */
+        margin-left: 8px; /* Espacio entre el botón de anular y ver */
+        white-space: nowrap;
+    }
+
+    /* Media Queries para responsividad */
+    @media (max-width: 768px) {
+        .abr-report-table thead {
+            display: none;
+            /* Oculta los encabezados de tabla en móvil */
+        }
+
+        .abr-report-table,
+        .abr-report-table tbody,
+        .abr-report-table tr,
+        .abr-report-table td {
+            display: block;
+            /* Hace que las filas y celdas se comporten como bloques */
+            width: 100%;
+            /* Las celdas y filas ocupan todo el ancho */
+        }
+
+        .abr-report-table tr {
+            margin-bottom: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            background-color: #ffffff;
+        }
+
+        .abr-report-table td {
+            border: none;
+            /* Elimina los bordes internos de las celdas */
+            border-bottom: 1px solid #eee;
+            /* Añade un borde entre las "filas" de las celdas */
+        }
+
+        .abr-report-table td:last-child {
+            border-bottom: none;
+        }
+
+        .abr-report-table td[data-label]::before {
+            text-align: right;
+            /* Alinea la etiqueta a la derecha */
+            padding-right: 10px;
+            /* Espacio entre etiqueta y valor */
+        }
+
+        .abr-filter-section {
+            flex-direction: column;
+            /* Apila los elementos de filtro */
+            align-items: stretch;
+            /* Estira los elementos para ocupar el ancho */
+        }
+
+        .abr-filter-section select,
+        .abr-filter-section .abr-btn-apply-filter {
+            width: 100%;
+            /* Ancho completo para select y botón en móvil */
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    {# Sidebar de Navegación del Administrador #}
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h2>Menú Administrador</h2>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin_dashboard_view') }}" class="sidebar-link">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <span>Dashboard Principal</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('manage_products_view') }}" class="sidebar-link">
+                    <i class="fa-solid fa-boxes"></i>
+                    <span>Gestionar Productos</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('manage_users_view') }}" class="sidebar-link">
+                    <i class="fa-solid fa-users-cog"></i>
+                    <span>Gestionar Usuarios</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                {# Enlace activo para la página actual #}
+                <a href="{{ url_for('admin_boletas_reports_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'admin_boletas_reports_view' %}active{% endif %}">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    <span>Reportes y Boletas</span>
+                </a>
+            </li>
+            
+        </ul>
+        {# Botón de Cerrar Sesión #}
+        <p style="text-align: center; margin-top: 30px;">
+            <a href="{{ url_for('logout') }}" class="button secondary">Cerrar Sesión</a>
+        </p>
+    </aside>
+
+    {# Contenido Principal de la Página #}
+    <div class="main-content">
+        <main class="content px-3 py-4">
+            <div class="container-fluid abr-container"> {# Usar la nueva clase de contenedor #}
+                {# Incluye el template para mostrar mensajes flash de Flask #}
+                {% include 'messages.html' %}
+
+                <h3 class="abr-heading">Reportes y Boletas</h3> {# Usar la nueva clase de encabezado #}
+
+                {# Sección de Filtro por Empleado #}
+                <div class="abr-filter-section"> {# Usar la nueva clase para la sección de filtro #}
+                    <label for="employee_filter">Filtrar por Empleado:</label>
+                    <select id="employee_filter" name="employee_id">
+                        {% for employee in employees %}
+                        <option value="{{ employee.id }}" {% if selected_employee_id==employee.id %}selected{% endif %}>
+                            {% if employee.id == 0 %}
+                            {{ employee.first_name }} {{ employee.last_name }} (Todos los Empleados)
+                            {% else %}
+                            {{ employee.first_name }} {{ employee.last_name }} (ID: {{ employee.id }})
+                            {% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button id="apply_filter_btn" class="abr-btn-apply-filter">Aplicar Filtro</button> {# Usar la nueva
+                    clase para el botón #}
+                </div>
+
+                {# Tabla de Boletas #}
+                {% if sales %}
+                <div class="abr-report-table-container"> {# Usar la nueva clase de contenedor de tabla #}
+                    <table class="abr-report-table"> {# Usar la nueva clase de tabla #}
+                        <thead>
+                            <tr>
+                                <th>ID Boleta</th>
+                                <th>Fecha</th>
+                                <th>Empleado</th>
+                                <th>Monto Total</th>
+                                <th>Método de Pago</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sale in sales %}
+                            <tr>
+                                <td data-label="ID Boleta">{{ sale.sale_id }}</td>
+                                <td data-label="Fecha">{{ sale.sale_date_formatted }}</td>
+                                <td data-label="Empleado">{{ sale.employee_first_name }} {{ sale.employee_last_name }}
+                                </td>
+                                <td data-label="Monto Total">${{ "%.2f"|format(sale.total_amount) }}</td>
+                                <td data-label="Método de Pago">{{ sale.payment_method }}</td>
+                                <td data-label="Estado">
+                                    {% if sale.is_cancelled %}
+                                    <span class="abr-status-cancelled">Anulada</span> {# Usar la nueva clase de estado
+                                    #}
+                                    {% else %}
+                                    <span class="abr-status-active">Activa</span> {# Usar la nueva clase de estado #}
+                                    {% endif %}
+                                </td>
+                                <td data-label="Acciones">
+                                    {% if not sale.is_cancelled %}
+                                    <button class="abr-btn-cancel-sale" data-id="{{ sale.sale_id }}">Anular
+                                        Boleta</button>
+                                    {% else %}
+                                    <button class="abr-btn-cancel-sale" disabled
+                                        style="opacity: 0.6; cursor: not-allowed;">Anulada</button>
+                                    {% endif %}
+                                    {# Este es el cambio clave: el enlace ahora apunta a 'generate_invoice' #}
+                                    <a href="{{ url_for('generate_invoice', sale_id=sale.sale_id, origin='admin_reports') }}"
+                                        class="abr-btn-view-invoice">Ver Boleta</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="abr-no-sales-message">No hay boletas registradas o que coincidan con el filtro.</p> {# Usar la
+                nueva clase de mensaje #}
+                {% endif %}
+
+            </div> {# Cierra el container-fluid #}
+        </main>
+    </div> {# Cierra el main-content #}
+</div> {# Cierra el dashboard-layout #}
+
+{# Modal de Confirmación de Anulación #}
+<div id="cancelSaleModal" class="abr-modal-overlay"> {# Usar la nueva clase de overlay #}
+    <div class="abr-modal-content"> {# Usar la nueva clase de contenido del modal #}
+        <span class="abr-close-button" onclick="closeModal('cancelSaleModal')">&times;</span> {# Usar la nueva clase de
+        botón de cerrar #}
+        <h2>Confirmar Anulación de Boleta</h2>
+        <p>¿Estás seguro de que quieres anular la boleta #<strong id="cancelSaleIdDisplay"></strong>?</p>
+        <p>Esta acción no se puede deshacer y marcará la boleta como "Anulada" en los reportes.</p>
+        <div class="abr-modal-buttons"> {# Usar la nueva clase de botones del modal #}
+            <button type="button" class="abr-btn-confirm-action" id="confirmCancelSaleBtn">Anular Boleta</button> {#
+            Usar la nueva clase de botón #}
+            <button type="button" class="abr-btn-cancel-modal" onclick="closeModal('cancelSaleModal')">Cancelar</button>
+            {# Usar la nueva clase de botón #}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    // Función para abrir un modal específico
+    function openModal(modalId) {
+        const modalElement = document.getElementById(modalId);
+        if (modalElement) {
+            // Usar 'flex' para centrar el modal y 'important' para asegurar la sobrescritura de estilos
+            modalElement.style.setProperty('display', 'flex', 'important');
+            modalElement.style.setProperty('z-index', '99999', 'important'); // Asegurar que esté por encima de todo
+        }
+    }
+
+    // Función para cerrar un modal específico
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Cerrar el modal al hacer clic fuera de él
+    window.onclick = function (event) {
+        const cancelModal = document.getElementById('cancelSaleModal');
+        if (event.target === cancelModal) { // Usa triple igual para comparación estricta
+            cancelModal.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Manejo del filtro por empleado
+        document.getElementById('apply_filter_btn').addEventListener('click', function () {
+            const employeeId = document.getElementById('employee_filter').value;
+            // Redirige a la misma URL con el parámetro de filtro para que Flask procese la solicitud
+            window.location.href = `{{ url_for('admin_boletas_reports_view') }}?employee_id=${employeeId}`;
+        });
+
+        // Manejo del botón "Anular Boleta"
+        let currentSaleIdToCancel = null; // Variable para almacenar el ID de la boleta a anular
+
+        // Selecciona todos los botones de "Anular Boleta"
+        document.querySelectorAll('.abr-btn-cancel-sale').forEach(button => { // Usar la nueva clase
+            button.addEventListener('click', function () {
+                currentSaleIdToCancel = this.dataset.id; // Obtiene el ID de la boleta del atributo data-id
+                document.getElementById('cancelSaleIdDisplay').textContent = currentSaleIdToCancel; // Muestra el ID en el modal
+                openModal('cancelSaleModal'); // Abre el modal de confirmación
+            });
+        });
+
+        // Manejo del botón de confirmación dentro del modal
+        document.getElementById('confirmCancelSaleBtn').addEventListener('click', function () {
+            if (currentSaleIdToCancel) {
+                // Envía una petición POST al servidor para anular la venta
+                fetch(`/cancel_sale/${currentSaleIdToCancel}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' // Indica que el cuerpo de la petición es JSON (aunque vacío aquí)
+                    },
+                    // Si necesitas enviar datos en el cuerpo, descomenta la siguiente línea:
+                    // body: JSON.stringify({})
+                })
+                    .then(response => {
+                        // Si Flask realiza una redirección (ej. con flash y redirect), la respuesta.redirected será true
+                        if (response.redirected) {
+                            window.location.href = response.url; // Sigue la redirección de Flask
+                        } else if (response.ok) {
+                            // Si la respuesta es OK (status 200-299) y no hubo redirección, recarga la página
+                            window.location.reload();
+                        } else {
+                            // Si hay un error HTTP (ej. 400, 500) y no hay redirección
+                            // Intenta parsear la respuesta como JSON para obtener un mensaje de error
+                            return response.json().then(data => {
+                                alert(data.message || 'Error al anular la boleta.'); // Muestra un mensaje de error del servidor o genérico
+                                closeModal('cancelSaleModal'); // Cierra el modal
+                            }).catch(() => {
+                                // Si no se puede parsear como JSON, muestra un error desconocido
+                                alert('Error desconocido al anular la boleta.');
+                                closeModal('cancelSaleModal');
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        // Captura errores de red u otros errores durante la petición
+                        console.error('Error en la petición de anulación:', error);
+                        alert('Hubo un problema de conexión al anular la boleta.');
+                        closeModal('cancelSaleModal');
+                    });
+            }
+        });
+    });
+</script>
+{% endblock %}

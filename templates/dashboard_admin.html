@@ -1,0 +1,372 @@
+{# templates/dashboard_admin.html #}
+{% extends "base.html" %}
+
+{% block title %}Dashboard de Administrador{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='empleado_style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='admin_style.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h2>Menú Administrador</h2>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin_dashboard_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'admin_dashboard_view' %}active{% endif %}">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <span>Dashboard Principal</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('manage_products_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'manage_products_view' %}active{% endif %}">
+                    <i class="fa-solid fa-boxes"></i>
+                    <span>Gestionar Productos</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('manage_users_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'manage_users_view' %}active{% endif %}">
+                    <i class="fa-solid fa-users-cog"></i>
+                    <span>Gestionar Usuarios</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin_boletas_reports_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'admin_boletas_reports_view' %}active{% endif %}">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    <span>Reportes y Boletas</span>
+                </a>
+            </li>
+            
+        </ul>
+        <p style="text-align: center; margin-top: 30px;"><a href="{{ url_for('logout') }}"
+                class="button secondary">Cerrar Sesión</a></p>
+    </aside>
+    <div class="main-content">
+        <main class="content px-3 py-4">
+            <div class="container-fluid">
+                {% include 'messages.html' %}
+
+                <div class="admin-dashboard-welcome">
+                    <h1>¡Bienvenido, Administrador {{ full_name }}!</h1>
+                    <p>Has iniciado sesión correctamente. Este es tu panel de administración.</p>
+                </div>
+
+                {# PRIMER BLOQUE: Resumen del Sistema (6 cuadros) #}
+                <div class="admin-card">
+                    <h2>Resumen del Sistema</h2>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <h3>Ventas de Hoy</h3>
+                           <p>S/. {{ "%.2f"|format(stats.total_sales_today) }}</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>Empleados Activos</h3>
+                            <p>{{ stats.num_employees }}</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>Clientes Registrados</h3>
+                            <p>{{ stats.num_clients }}</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>Stock Total</h3>
+                            <p>{{ stats.total_products_in_stock }} Unidades</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>Productos Registrados</h3>
+                            <p>{{ stats.total_products_count }}</p>
+                        </div>
+                        <div class="stat-item {% if stats.low_stock_products_count > 0 %}danger{% endif %}">
+                            <h3>Productos con Bajo Stock</h3>
+                            <p>{{ stats.low_stock_products_count }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                {# SEGUNDO BLOQUE: Empleados Top por Ventas (3 cuadros en una línea) #}
+                {# Este bloque está ubicado *debajo* del admin-card de "Resumen del Sistema" #}
+                {# Usamos .get() y |default para evitar UndefinedError si las claves no existen en stats #}
+                <div class="admin-card">
+                    <h2>Empleados Top por Ventas</h2>
+                    <div class="stats-grid"> {# Un nuevo stats-grid para estos tres cuadros #}
+                        <div class="stat-item">
+                            <h3>Empleado Top Ventas (Hoy)</h3>
+                            <p>{{ stats.get('top_employee_sales', {}).get('name', 'Nadie ha vendido aún') }}</p> {# <---
+                                CORREGIDO AQUÍ #} <p>${{ "%.2f"|format(stats.get('top_employee_sales',
+                                {}).get('total_sales', 0)) }}</p> {# <--- Y CORREGIDO AQUÍ #} </div>
+                                    <div class="stat-item">
+                                        <h3>Empleado Top Ventas (Semana)</h3>
+                                        {# Si aún no tienes top_employee_sales_week en app.py, estos seguirán mostrando
+                                        'N/A' #}
+                                        <p>{{ stats.get('top_employee_sales_week', {}).get('name', 'Nadie ha vendido
+                                            aún') }}</p>
+                                        <p>${{ "%.2f"|format(stats.get('top_employee_sales_week', {}).get('total_sales',
+                                            0)) }}</p>
+                                    </div>
+                                    <div class="stat-item">
+                                        <h3>Empleado Top Ventas (Mes)</h3>
+                                        {# Si aún no tienes top_employee_sales_month en app.py, estos seguirán mostrando
+                                        'N/A' #}
+                                        <p>{{ stats.get('top_employee_sales_month', {}).get('name', 'Nadie ha vendido
+                                            aún') }}</p>
+                                        <p>${{ "%.2f"|format(stats.get('top_employee_sales_month',
+                                            {}).get('total_sales', 0)) }}</p>
+                                    </div>
+                        </div>
+                    </div>
+
+                    {% if stats.low_stock_products_list %}
+                    <div class="admin-card">
+                        <h2>Detalle de Productos con Bajo Stock</h2>
+                        <div class="low-stock-list">
+                            <ul>
+                                {% for product in stats.low_stock_products_list %}
+                                <li>
+                                    <span>{{ product.name }}</span>
+                                    <span>Stock: {{ product.stock }}</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {# Sección para los gráficos #}
+                    <div class="admin-card charts-section">
+                        <h2>Análisis Gráfico</h2>
+                        <div class="chart-grid">
+                            <div class="chart-item">
+                                <h3>Ventas Diarias (Últimos 7 días)</h3>
+                                <canvas id="dailySalesChart"></canvas>
+                            </div>
+                            <div class="chart-item">
+                                <h3>Distribución de Entidades</h3>
+                                <canvas id="entitiesDistributionChart"></canvas>
+                            </div>
+                            <div class="chart-item"> {# Gráfico de productos más vendidos #}
+                                <h3>Productos Más Vendidos (Top 5)</h3>
+                                <canvas id="topSellingProductsChart"></canvas>
+                            </div>
+
+                            {# AÑADIDO: Nuevo gráfico de barras para ventas por empleado #}
+                            <div class="chart-item">
+                                <h3>Ventas Totales por Empleado</h3>
+                                <canvas id="employeeSalesChart"></canvas>
+                            </div>
+                            {# FIN AÑADIDO #}
+
+                        </div>
+                    </div>
+
+                    {# INICIO NUEVA SECCIÓN: Empleado Top Ventas por Producto #}
+                    {% if stats.top_employee_by_product %}
+                    <div class="admin-card full-width-card">
+                        <h2>Empleado con Más Ventas por Cada Producto Top</h2>
+                        <div class="product-employee-sales-grid">
+                            {% for item in stats.top_employee_by_product %}
+                            <div class="product-employee-card">
+                                <h4>Producto: {{ item.product_name }}</h4>
+                                <p>Total Vendido (este producto): <strong>{{ item.total_sold_product }}
+                                        unidades</strong>
+                                </p>
+                                <p>Empleado Top: <strong>{{ item.top_employee.name }}</strong></p>
+                                <p>Cantidad vendida por empleado: <strong>{{ item.top_employee.quantity_sold }}
+                                        unidades</strong></p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {# FIN NUEVA SECCIÓN #}
+
+                </div> {# Cierra el container-fluid #}
+        </main>
+    </div> {# Cierra el main-content #}
+</div> {# Cierra el dashboard-layout #}
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const stats = {{ stats | tojson
+    }};
+
+    // --- Gráfico de Ventas Diarias (Historial de Ventas) ---
+    const dailySalesCtx = document.getElementById('dailySalesChart').getContext('2d');
+    new Chart(dailySalesCtx, {
+        type: 'line',
+        data: {
+            labels: stats.sales_history.labels,
+            datasets: [{
+                label: 'Ventas Diarias (S/.)',
+                data: stats.sales_history.values,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Monto de Ventas (S/.)' }
+                },
+                x: {
+                    title: { display: true, text: 'Fecha' }
+                }
+            },
+            plugins: {
+                legend: { display: true, position: 'top' },
+                title: { display: true, text: 'Historial de Ventas (Últimos 7 días)' }
+            }
+        }
+    });
+
+    // --- Gráfico de Distribución de Entidades (Productos, Clientes, Empleados) ---
+    const entitiesCtx = document.getElementById('entitiesDistributionChart').getContext('2d');
+    new Chart(entitiesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Productos', 'Clientes', 'Empleados'],
+            datasets: [{
+                label: 'Cantidad',
+                data: [stats.total_products_count, stats.num_clients, stats.num_employees],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: { padding: { bottom: 30 } },
+            plugins: {
+                legend: { position: 'bottom' },
+                title: { display: true, text: 'Distribución de Entidades' }
+            }
+        }
+    });
+
+    // --- Gráfico de Productos Más Vendidos ---
+    if (stats.top_selling_products && stats.top_selling_products.length > 0) {
+        const topProductsLabels = stats.top_selling_products.map(p => p.product_name);
+        const topProductsData = stats.top_selling_products.map(p => p.total_sold);
+
+        const topSellingCtx = document.getElementById('topSellingProductsChart').getContext('2d');
+        new Chart(topSellingCtx, {
+            type: 'bar',
+            data: {
+                labels: topProductsLabels,
+                datasets: [{
+                    label: 'Unidades Vendidas',
+                    data: topProductsData,
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y', // Barras horizontales
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { beginAtZero: true, title: { display: true, text: 'Cantidad Vendida' } },
+                    y: { title: { display: true, text: 'Producto' } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Top 5 Productos Más Vendidos' }
+                }
+            }
+        });
+    }
+
+    // --- Gráfico de Ventas Totales por Empleado (NUEVO) ---
+    if (stats.employee_sales_chart && stats.employee_sales_chart.labels.length > 0) {
+        const employeeSalesCtx = document.getElementById('employeeSalesChart').getContext('2d');
+        new Chart(employeeSalesCtx, {
+            type: 'bar',
+            data: {
+                labels: stats.employee_sales_chart.labels,
+                datasets: [{
+                    label: 'Ventas Totales (S/.)',
+                    data: stats.employee_sales_chart.data,
+                    backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Monto de Ventas (S/.)' }
+                    },
+                    x: {
+                        title: { display: true, text: 'Empleado' }
+                    }
+                },
+                plugins: {
+                    legend: { display: true, position: 'top' },
+                    title: { display: true, text: 'Ventas Totales por Empleado' }
+                }
+            }
+        });
+    }
+    if (stats.low_stock_products_list && stats.low_stock_products_list.length > 0) {
+        const lowStockLabels = stats.low_stock_products_list.map(p => p.name);
+        const lowStockData = stats.low_stock_products_list.map(p => p.stock);
+
+        const lowStockCtx = document.getElementById('lowStockChart');
+        if (lowStockCtx) { // Asegurarse de que el elemento exista antes de intentar crear el gráfico
+            new Chart(lowStockCtx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: lowStockLabels,
+                    datasets: [{
+                        label: 'Stock Actual',
+                        data: lowStockData,
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: 'Stock' } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Productos con Bajo Stock' }
+                    }
+                }
+            });
+        }
+    }
+    });
+</script>
+{% endblock %}

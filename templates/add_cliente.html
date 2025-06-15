@@ -1,0 +1,111 @@
+{# templates/add_cliente.html #} {# *** CAMBIO AQUÍ *** #}
+{% extends "base.html" %}
+
+{% block title %}Registrar Nuevo Cliente{% endblock %}
+
+{% block main_class %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='empleado_style.css') }}">
+
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <h2>Menú Empleado</h2>
+        <ul>
+            <li class="sidebar-item">
+                <a href="{{ url_for('employee_dashboard_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'employee_dashboard_view' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Consultar Inventario</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('new_sale_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'new_sale_view' %}active{% endif %}">
+                    <i class="fa-solid fa-cash-register"></i>
+                    <span>Crear Nueva Venta</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('consult_sales_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'consult_sales_view' %}active{% endif %}">
+                    <i class="fa-solid fa-receipt"></i>
+                    <span>Ver y Buscar Ventas</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('consult_clients_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'consult_clients_view' %}active{% endif %}">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Consultar Clientes</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('add_client_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'add_client_view' %}active{% endif %}">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Añadir Nuevo Cliente</span>
+                </a>
+            </li>
+            {# Enlaces de perfil de usuario (aplican a ambos roles) #}
+            <li class="sidebar-item">
+                <a href="{{ url_for('my_profile_view') }}" class="sidebar-link">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Mi Perfil</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('change_password_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'change_password_view' %}active{% endif %}">
+                    <i class="fa-solid fa-key"></i>
+                    <span>Cambiar Contraseña</span>
+                </a>
+            </li>
+        </ul>
+        <p style="text-align: center; margin-top: 30px;"><a href="{{ url_for('logout') }}"
+                class="button secondary">Cerrar Sesión</a></p>
+    </aside>
+
+    <div class="main-content">
+        {% include 'messages.html' %}
+        <h1>Registrar Nuevo Cliente</h1>
+        <p>Completa el formulario para añadir un nuevo cliente a la base de datos.</p>
+
+        <div class="content-section">
+            <form action="{{ url_for('add_client_view') }}" method="POST">
+                <div class="form-group">
+                    <label for="full_name">Nombre Completo:</label>
+                    <input type="text" id="full_name" name="full_name" class="form-control"
+                        value="{{ full_name if full_name is defined }}" required
+                        placeholder="Nombre completo del cliente">
+                </div>
+                <div class="form-group">
+                    <label for="dni">DNI/RUC (Opcional):</label>
+                    <input type="text" id="dni" name="dni" class="form-control" value="{{ dni if dni is defined }}"
+                        placeholder="DNI o RUC del cliente">
+                </div>
+                <div class="form-group">
+                    <label for="address">Dirección (Opcional):</label>
+                    <input type="text" id="address" name="address" class="form-control"
+                        value="{{ address if address is defined }}" placeholder="Dirección del cliente">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Teléfono (Opcional):</label>
+                    <input type="text" id="phone" name="phone" class="form-control"
+                        value="{{ phone if phone is defined }}" placeholder="Número de teléfono del cliente">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email (Opcional):</label>
+                    <input type="email" id="email" name="email" class="form-control"
+                        value="{{ email if email is defined }}" placeholder="Correo electrónico del cliente">
+                </div>
+                <button type="submit" class="button primary">Registrar Cliente</button>
+                <a href="{{ url_for('new_sale_view') }}" class="button secondary">Volver a Venta</a>
+            </form>
+        </div>
+    </div> {# Fin main-content #}
+</div> {# Fin dashboard-layout #}
+{% endblock %}

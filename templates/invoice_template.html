@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boleta de Venta #{{ invoice.sale_id }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            padding: 20px;
+        }
+        .invoice-container {
+            max-width: 800px;
+            margin: 30px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            border: 1px solid #e9ecef;
+        }
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 20px;
+        }
+        .invoice-header h1 {
+            color: #007bff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .invoice-header p {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+        .invoice-details p {
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        .invoice-details strong {
+            color: #212529;
+            width: 120px; /* Ancho fijo para las etiquetas fuertes */
+            display: inline-block;
+        }
+        .invoice-items {
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .invoice-items h3 {
+            color: #007bff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .invoice-items .table thead th {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+            vertical-align: middle;
+        }
+        .invoice-items .table tbody tr:nth-child(even) {
+            background-color: #f2f5f7;
+        }
+        .invoice-items .table td {
+            vertical-align: middle;
+            font-size: 0.9em;
+        }
+        .invoice-total {
+            text-align: right;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #007bff;
+        }
+        .invoice-total p {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #28a745;
+        }
+        .invoice-footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.85em;
+            color: #6c757d;
+            border-top: 1px dashed #ced4da;
+            padding-top: 20px;
+        }
+
+        /* Estilos para impresión */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background-color: #ffffff;
+                margin: 0;
+                padding: 0;
+            }
+            .invoice-container {
+                box-shadow: none;
+                border: none;
+                margin: 0;
+                padding: 0;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <h1>Boleta de Venta</h1>
+            <p>Sistema de Gestión de Ventas</p>
+            {# Línea original que causó el error: <p>Fecha de Emisión: {{ 'now' | datetimeformat }}</p> #}
+            {# La eliminamos si no tienes un filtro 'datetimeformat' o 'now' configurado #}
+            {# O si quieres una fecha simple puedes usar: <p>Fecha de Emisión: {{ invoice.sale_date_formatted.split(' ')[0] }}</p> #}
+            {# Como la fecha de emisión suele ser la fecha actual, si no la necesitas en la plantilla, es mejor quitarla o generarla en el cliente (JS) #}
+            {# Para evitar el error, la eliminamos por ahora. #}
+        </div>
+
+        <div class="invoice-details">
+            <p><strong>Boleta N°:</strong> {{ invoice.sale_id }}</p>
+            {# Usamos invoice.sale_date_formatted que ya viene pre-formateada desde app.py #}
+            <p><strong>Fecha de Venta:</strong> {{ invoice.sale_date_formatted }}</p>
+            <hr>
+            <p><strong>Datos del Empleado:</strong></p>
+            {# Esto asume que invoice.employee_full_name se arma en Python, si no, usa employee_first_name y employee_last_name #}
+            <p><strong>Nombre:</strong> {{ invoice.employee_first_name or '' }} {{ invoice.employee_last_name or '' }} ({{ invoice.employee_username or '' }})</p>
+            <hr>
+            <p><strong>Datos del Cliente:</strong></p>
+            {# Usar 'or' con cadenas vacías para evitar 'None' si el cliente es nulo #}
+            <p><strong>Nombre:</strong> {{ invoice.client_name or 'Público General' }}</p>
+            <p><strong>DNI:</strong> {{ invoice.client_dni or 'N/A' }}</p>
+            <p><strong>Dirección:</strong> {{ invoice.client_address or 'N/A' }}</p>
+            <p><strong>Teléfono:</strong> {{ invoice.client_phone or 'N/A' }}</p>
+            <p><strong>Email:</strong> {{ invoice.client_email or 'N/A' }}</p>
+            <p><strong>Método de Pago:</strong> {{ invoice.payment_method }}</p>
+        </div>
+
+        <div class="invoice-items">
+            <h3>Detalle de Ítems</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>P. Unitario</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if invoice.items %}
+                        {% for item in invoice['items'] %} 
+                            <tr>
+                                <td>{{ item.product_name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>S/. {{ '%.2f' | format(item.price_at_sale) }}</td>
+                                <td>S/. {{ '%.2f' | format(item.subtotal) }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">No hay ítems registrados para esta venta.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="invoice-total">
+            {# Usamos las variables calculadas en Python para subtotal, IGV y total final #}
+            <p>Subtotal: S/. {{ '%.2f' | format(subtotal_calculated) }}</p>
+            <p>IGV (18%): S/. {{ '%.2f' | format(igv_calculated) }}</p>
+            <p><strong>TOTAL A PAGAR: S/. {{ '%.2f' | format(total_calculated) }}</strong></p>
+        </div>
+
+        <div class="invoice-footer">
+            <p>¡Gracias por su compra!</p>
+            <p>Este documento es una representación impresa de la boleta de venta.</p>
+        </div>
+
+        <div class="text-center mt-4 no-print">
+            <button class="btn btn-primary" onclick="window.print()">Imprimir Boleta</button>
+            
+            {% if origin == 'admin_reports' %}
+                <a href="{{ url_for('admin_boletas_reports_view') }}" class="btn btn-secondary ms-2">Volver a Reportes y Boletas</a>
+            {% else %}
+                <a href="{{ url_for('consult_sales_view') }}" class="btn btn-secondary ms-2">Volver a Consultar Ventas</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

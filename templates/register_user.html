@@ -1,0 +1,237 @@
+{# templates/register_user.html #}
+{% extends "base.html" %}
+
+{% block title %}Registrar Nuevo Usuario{% endblock %}
+
+{% block extra_css %}
+{# Importa tus estilos generales para empleados y administradores #}
+<link rel="stylesheet" href="{{ url_for('static', filename='empleado_style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='admin_style.css') }}">
+
+<style>
+    /* Estilos específicos para el formulario de registro de usuario */
+    .register-form-container {
+        max-width: 600px;
+        /* Un poco más ancho para mejor presentación */
+        margin: 20px auto;
+        /* Reducir margen superior para ajustarse al layout */
+        padding: 30px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .register-form-container h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #333;
+        font-size: 1.8em;
+        border-bottom: 1px solid #eee;
+        /* Línea de separación para el título */
+        padding-bottom: 10px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #555;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="password"],
+    .form-group input[type="email"],
+    .form-group input[type="tel"],
+    .form-group input[type="number"],
+    /* Añadir si se usa para algo como stock */
+    .form-group select,
+    .form-group textarea {
+        /* Añadir si se usa para descripciones largas */
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+        /* Incluye padding y border en el ancho total */
+        font-size: 1em;
+    }
+
+    /* Estilos para los botones del formulario */
+    .form-buttons {
+        display: flex;
+        /* Para alinear los botones horizontalmente */
+        justify-content: space-between;
+        /* Espacio entre ellos */
+        gap: 15px;
+        /* Espacio entre los botones */
+        margin-top: 25px;
+    }
+
+    .btn-register-submit {
+        flex-grow: 1;
+        /* Para que el botón ocupe el espacio disponible */
+        background-color: #28a745;
+        /* Verde para acción principal */
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1.1em;
+        text-align: center;
+        text-decoration: none;
+        /* Si es un enlace */
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-register-submit:hover {
+        background-color: #218838;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-back-to-list {
+        flex-grow: 1;
+        /* Para que el botón ocupe el espacio disponible */
+        background-color: #6c757d;
+        /* Gris para "atrás" */
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1.1em;
+        text-align: center;
+        text-decoration: none;
+        /* Si es un enlace */
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-back-to-list:hover {
+        background-color: #5a6268;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Media Queries para responsividad */
+    @media (max-width: 768px) {
+        .form-buttons {
+            flex-direction: column;
+            /* Apila los botones en pantallas pequeñas */
+            gap: 10px;
+        }
+
+        .register-form-container {
+            margin: 20px 10px;
+            /* Margen a los lados en pantallas pequeñas */
+            padding: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{# Envuelve el contenido del formulario dentro de la estructura de dashboard #}
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h2>Menú Administrador</h2>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin_dashboard_view') }}" class="sidebar-link">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <span>Dashboard Principal</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('manage_products_view') }}" class="sidebar-link">
+                    <i class="fa-solid fa-boxes"></i>
+                    <span>Gestionar Productos</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                {# manage_users_view está activo porque esta página se deriva de la gestión de usuarios #}
+                <a href="{{ url_for('manage_users_view') }}" class="sidebar-link active">
+                    <i class="fa-solid fa-users-cog"></i>
+                    <span>Gestionar Usuarios</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin_boletas_reports_view') }}" class="sidebar-link"> <i
+                        class="fa-solid fa-file-invoice"></i>
+                    <span>Reportes y Facturas</span>
+                </a>
+            </li>
+            
+        </ul>
+        <p style="text-align: center; margin-top: 30px;"><a href="{{ url_for('logout') }}"
+                class="button secondary">Cerrar Sesión</a></p>
+    </aside>
+    <div class="main-content">
+        <main class="content px-3 py-4">
+            <div class="container-fluid"> {# Puedes usar un contenedor más genérico aquí o envolver directamente #}
+                <div class="register-form-container">
+                    <h2>Registrar Nuevo Usuario</h2>
+                    {% include 'messages.html' %} {# Para mostrar mensajes flash #}
+                    <form action="{{ url_for('register_user_view') }}" method="POST">
+                        <div class="form-group">
+                            <label for="username">Nombre de Usuario:</label>
+                            <input type="text" id="username" name="username" value="{{ username if username else '' }}"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Contraseña:</label>
+                            <input type="password" id="password" name="password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="first_name">Nombre:</label>
+                            <input type="text" id="first_name" name="first_name"
+                                value="{{ first_name if first_name else '' }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="last_name">Apellido:</label>
+                            <input type="text" id="last_name" name="last_name"
+                                value="{{ last_name if last_name else '' }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dni">DNI:</label>
+                            <input type="text" id="dni" name="dni" value="{{ dni if dni else '' }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" name="email" value="{{ email if email else '' }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Teléfono:</label>
+                            <input type="tel" id="phone" name="phone" value="{{ phone if phone else '' }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Dirección:</label>
+                            <input type="text" id="address" name="address" value="{{ address if address else '' }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="role">Rol:</label>
+                            <select id="role" name="role">
+                                <option value="employee" {% if role=='employee' %}selected{% endif %}>Empleado</option>
+                                <option value="admin" {% if role=='admin' %}selected{% endif %}>Administrador</option>
+                            </select>
+                        </div>
+                        <div class="form-buttons">
+                            <button type="submit" class="btn-register-submit">Registrar Usuario</button>
+                            {# Botón para regresar a la lista de usuarios #}
+                            <a href="{{ url_for('manage_users_view') }}" class="btn-back-to-list">
+                                <i class="fa-solid fa-arrow-left"></i> Volver a Gestión de Usuarios
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div> {# Cierra el container-fluid #}
+        </main>
+    </div> {# Cierra el main-content #}
+</div> {# Cierra el dashboard-layout #}
+{% endblock %}

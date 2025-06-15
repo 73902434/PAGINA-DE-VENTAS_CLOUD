@@ -1,0 +1,460 @@
+{# templates/consult_clients.html - Extiende base.html #}
+{% extends "base.html" %}
+
+{% block title %}Consultar Clientes{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='empleado_style.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout"> {# Usa la clase "dashboard-layout" para coincidir con tu CSS #}
+    <aside class="sidebar"> {# Usa la clase "sidebar" para coincidir con tu CSS #}
+        <div class="sidebar-logo"> {# ¡REINSTALADO! Aquí va el título de la barra lateral. #}
+            <h2>Menú Empleado</h2>
+        </div>
+        <ul class="sidebar-nav">
+            {# Enlaces para EMPLEADOS #}
+            <li class="sidebar-item">
+                <a href="{{ url_for('employee_dashboard_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'employee_dashboard_view' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Consultar Inventario</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('new_sale_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'new_sale_view' %}active{% endif %}">
+                    <i class="fa-solid fa-cash-register"></i>
+                    <span>Crear Nueva Venta</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('consult_sales_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'consult_sales_view' %}active{% endif %}">
+                    <i class="fa-solid fa-receipt"></i>
+                    <span>Ver y Buscar Ventas</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('consult_clients_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'consult_clients_view' %}active{% endif %}">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Consultar Clientes</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('add_client_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'add_client_view' %}active{% endif %}">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Añadir Nuevo Cliente</span>
+                </a>
+            </li>
+            {# Enlaces de perfil de usuario (aplican a ambos roles) #}
+            <li class="sidebar-item">
+                <a href="{{ url_for('my_profile_view') }}" class="sidebar-link">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Mi Perfil</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('change_password_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'change_password_view' %}active{% endif %}">
+                    <i class="fa-solid fa-key"></i>
+                    <span>Cambiar Contraseña</span>
+                </a>
+            </li>
+
+            {# Enlaces específicos para ADMINISTRADORES (se muestran solo si el rol es 'admin') #}
+            {% if session.get('role') == 'admin' %}
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
+                    data-bs-target="#adminCollapse" aria-expanded="false" aria-controls="adminCollapse">
+                    <i class="fa-solid fa-user-gear"></i>
+                    <span>Administración</span>
+                </a>
+                <ul id="adminCollapse" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                    <li class="sidebar-item">
+                        <a href="{{ url_for('admin_dashboard_view') }}" class="sidebar-link">Dashboard Admin</a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="{{ url_for('register_user_view') }}" class="sidebar-link">Registrar Usuario</a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="{{ url_for('register_product_view') }}" class="sidebar-link">Registrar Producto</a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="{{ url_for('register_client_view') }}" class="sidebar-link">Registrar Cliente</a>
+                    </li>
+                </ul>
+            </li>
+            {% endif %}
+        </ul>
+        <p style="text-align: center; margin-top: 30px;"><a href="{{ url_for('logout') }}"
+                class="button secondary">Cerrar Sesión</a></p>
+    </aside>
+    <div class="main-content">
+        <main class="content px-3 py-4">
+            <div class="container-fluid">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                <div class="mb-3">
+                    <h1 class="fw-bold fs-4 mb-3">Consultar Clientes</h1>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">Lista de Clientes</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form action="{{ url_for('consult_clients_view') }}" method="GET" class="mb-4">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control"
+                                                placeholder="Buscar por nombre, DNI, teléfono o email..." name="query"
+                                                value="{{ search_query }}">
+                                            <button class="btn btn-primary" type="submit">
+                                                <i class="fa-solid fa-magnifying-glass"></i> Buscar
+                                            </button>
+                                            {% if search_query %}
+                                            <a href="{{ url_for('consult_clients_view') }}"
+                                                class="btn btn-secondary ms-2">
+                                                <i class="fa-solid fa-xmark"></i> Limpiar búsqueda
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </form>
+
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">ID</th>
+                                                    <th scope="col">Nombre Completo</th>
+                                                    <th scope="col">DNI</th>
+                                                    <th scope="col">Dirección</th>
+                                                    <th scope="col">Teléfono</th>
+                                                    <th scope="col">Email</th>
+                                                    <th scope="col">Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% if clients %}
+                                                {% for client in clients %}
+                                                <tr>
+                                                    <th scope="row">{{ client.id }}</th>
+                                                    <td>{{ client.full_name }}</td>
+                                                    <td>{{ client.dni }}</td>
+                                                    <td>{{ client.address }}</td>
+                                                    <td>{{ client.phone }}</td>
+                                                    <td>{{ client.email }}</td>
+                                                    <td>
+                                                        {# ***** BOTÓN DE EDITAR CLIENTE (SIN data-bs-toggle ni
+                                                        data-bs-target) ***** #}
+                                                        <button class="btn btn-sm btn-info btn-edit-client"
+                                                            data-client-id="{{ client.id }}" title="Editar Cliente">
+                                                            <i class="fa-solid fa-edit"></i>
+                                                        </button>
+                                                        {# ***** MODIFICACIÓN AQUI: BOTÓN DE ELIMINAR CLIENTE ***** #}
+                                                        <button class="btn btn-sm btn-danger btn-delete-client"
+                                                            data-client-id="{{ client.id }}"
+                                                            data-client-name="{{ client.full_name }}"
+                                                            title="Eliminar Cliente">
+                                                            <i class="fa-solid fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                                {% else %}
+                                                <tr>
+                                                    <td colspan="7" class="text-center">No se encontraron clientes.</td>
+                                                </tr>
+                                                {% endif %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+{# ***** ESTRUCTURA DEL MODAL DE EDICIÓN DE CLIENTE ***** #}
+<div class="modal fade" id="editClientModal" tabindex="-1" aria-labelledby="editClientModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editClientModalLabel">Editar Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" id="closeModalHeaderBtn"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editClientForm">
+                    <input type="hidden" id="edit-client-id"> {# Campo oculto para el ID del cliente #}
+                    <div class="mb-3">
+                        <label for="edit-full-name" class="form-label">Nombre Completo</label>
+                        <input type="text" class="form-control" id="edit-full-name" readonly disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-dni" class="form-label">DNI</label>
+                        <input type="text" class="form-control" id="edit-dni" readonly disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-address" class="form-label">Dirección</label>
+                        <input type="text" class="form-control" id="edit-address" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-phone" class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="edit-phone" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="edit-email" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                    id="cancelClientChangesBtn">Cancelar</button>
+                <button type="submit" class="btn btn-primary" form="editClientForm" id="saveClientChangesBtn">Guardar
+                    Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ***** NUEVO: MODAL DE CONFIRMACIÓN DE ELIMINACIÓN DE CLIENTE ***** #}
+<div class="modal fade" id="deleteClientConfirmModal" tabindex="-1" aria-labelledby="deleteClientConfirmModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteClientConfirmModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que quieres eliminar al cliente **<span id="clientToDeleteName"
+                    style="font-weight: bold;"></span>** (ID: <span id="clientToDeleteId"></span>)?
+                <br>Esta acción **no se puede deshacer**.
+                <input type="hidden" id="confirm-delete-client-id">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteClientBtn">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const toggler = document.querySelector('.toggle-btn');
+        const sidebar = document.querySelector('#sidebar');
+
+        if (toggler && sidebar) {
+            toggler.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+            });
+        }
+
+        const editClientModalElement = document.getElementById('editClientModal');
+        const editClientModal = new bootstrap.Modal(editClientModalElement);
+
+        const saveClientChangesBtn = document.getElementById('saveClientChangesBtn');
+        const cancelClientChangesBtn = document.getElementById('cancelClientChangesBtn');
+        const closeModalHeaderBtn = document.getElementById('closeModalHeaderBtn');
+
+        // Función para limpiar el backdrop y las clases del body/html
+        function cleanupModalBackdrop() {
+            document.body.classList.remove('modal-open');
+            document.documentElement.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => {
+                if (backdrop) {
+                    backdrop.remove();
+                }
+            });
+        }
+
+        document.querySelectorAll('.btn-edit-client').forEach(button => {
+            button.addEventListener('click', function () {
+                const clientId = this.dataset.clientId;
+                cleanupModalBackdrop(); // Llama a la limpieza antes de mostrar el modal
+                fetch(`/client_details/${clientId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(errorData => {
+                                throw new Error(errorData.message || `Error HTTP: ${response.status}`);
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('edit-client-id').value = data.client.id;
+                            document.getElementById('edit-full-name').value = data.client.full_name;
+                            document.getElementById('edit-dni').value = data.client.dni;
+                            document.getElementById('edit-address').value = data.client.address;
+                            document.getElementById('edit-phone').value = data.client.phone;
+                            document.getElementById('edit-email').value = data.client.email;
+
+                            editClientModal.show();
+                            setTimeout(() => { // Limpieza agresiva después de un breve retraso
+                                cleanupModalBackdrop();
+                            }, 100);
+                        } else {
+                            alert('Error: ' + data.message);
+                            cleanupModalBackdrop(); // Llama a la limpieza en caso de error
+                        }
+                    })
+                    .catch(error => {
+                        alert('Error al cargar datos del cliente: ' + error.message);
+                        cleanupModalBackdrop(); // Llama a la limpieza en caso de error de conexión
+                    });
+            });
+        });
+
+        saveClientChangesBtn.addEventListener('click', function (event) {
+            event.preventDefault();
+
+            const clientId = document.getElementById('edit-client-id').value;
+            const updatedData = {
+                address: document.getElementById('edit-address').value,
+                phone: document.getElementById('edit-phone').value,
+                email: document.getElementById('edit-email').value
+            };
+
+            fetch(`/clients/update/${clientId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedData)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(errorData => {
+                            throw new Error(errorData.message || `Error HTTP: ${response.status}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        editClientModal.hide();
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                        editClientModal.hide();
+                        cleanupModalBackdrop(); // Llama a la limpieza en caso de error
+                    }
+                })
+                .catch(error => {
+                    alert('Error al actualizar cliente: ' + error.message);
+                    editClientModal.hide();
+                    cleanupModalBackdrop(); // Llama a la limpieza en caso de error de conexión
+                });
+        });
+
+        editClientModalElement.addEventListener('hidden.bs.modal', function () {
+            cleanupModalBackdrop(); // Llama a la limpieza al cerrar el modal
+        });
+
+        if (cancelClientChangesBtn) {
+            cancelClientChangesBtn.addEventListener('click', function () {
+                editClientModal.hide();
+                cleanupModalBackdrop(); // Llama a la limpieza al cancelar
+            });
+        }
+        if (closeModalHeaderBtn) {
+            closeModalHeaderBtn.addEventListener('click', function () {
+                editClientModal.hide();
+                cleanupModalBackdrop(); // Llama a la limpieza al cerrar desde la cabecera
+            });
+        }
+
+        // Lógica para el Modal de Confirmación de Eliminación
+        const deleteClientConfirmModalElement = document.getElementById('deleteClientConfirmModal');
+        const deleteClientConfirmModal = new bootstrap.Modal(deleteClientConfirmModalElement);
+        const confirmDeleteClientBtn = document.getElementById('confirmDeleteClientBtn');
+        const clientToDeleteNameSpan = document.getElementById('clientToDeleteName');
+        const clientToDeleteIdSpan = document.getElementById('clientToDeleteId');
+        const confirmDeleteClientIdInput = document.getElementById('confirm-delete-client-id');
+
+        document.querySelectorAll('.btn-delete-client').forEach(button => {
+            button.addEventListener('click', function () {
+                const clientId = this.dataset.clientId;
+                const clientName = this.dataset.clientName;
+
+                cleanupModalBackdrop(); // Llama a la limpieza antes de mostrar el modal
+
+                clientToDeleteNameSpan.textContent = clientName;
+                clientToDeleteIdSpan.textContent = clientId;
+                confirmDeleteClientIdInput.value = clientId;
+                deleteClientConfirmModal.show();
+                setTimeout(() => { // Limpieza agresiva después de un breve retraso
+                    cleanupModalBackdrop();
+                }, 100);
+            });
+        });
+
+        confirmDeleteClientBtn.addEventListener('click', function () {
+            const clientId = confirmDeleteClientIdInput.value;
+
+            fetch(`/clients/delete/${clientId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(errorData => {
+                            throw new Error(errorData.message || `Error HTTP: ${response.status}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        deleteClientConfirmModal.hide();
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                        deleteClientConfirmModal.hide();
+                        cleanupModalBackdrop(); // Llama a la limpieza en caso de error
+                    }
+                })
+                .catch(error => {
+                    alert('Error al eliminar cliente: ' + error.message);
+                    deleteClientConfirmModal.hide();
+                    cleanupModalBackdrop(); // Llama a la limpieza en caso de error de conexión
+                });
+        });
+
+        deleteClientConfirmModalElement.addEventListener('hidden.bs.modal', function () {
+            cleanupModalBackdrop(); // Llama a la limpieza al cerrar el modal
+        });
+    });
+</script>
+{% endblock %}

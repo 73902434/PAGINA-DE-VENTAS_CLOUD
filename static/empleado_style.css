@@ -1,0 +1,275 @@
+/* static/empleado_style.css */
+
+/* Agrega estas líneas al principio del archivo para un mejor manejo del box model */
+html {
+    box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+}
+
+/* --- REGLAS DE LAYOUT (MOVIMIENTO DE DASHBOARD_EMPLOYEE.HTML AQUI) --- */
+/* Estilos generales para el layout del dashboard */
+.dashboard-layout {
+    display: flex;
+    /* Usamos flexbox para el layout lateral */
+    height: 100vh;
+    /* Ocupa el 100% del viewport height para que el modal funcione correctamente */
+    width: 100%;
+    /* Ocupa el 100% del ancho dentro de main */
+}
+
+
+.sidebar {
+    width: 250px; /* Ancho fijo para el menú lateral */
+    min-width: 250px; /* Asegura que no se encoja */
+    background-color: #343a40; /* Color de fondo oscuro de Bootstrap */
+    color: white; /* Color del texto blanco */
+    padding: 20px; /* Espaciado interno */
+    position: sticky; /* Permite que la sidebar se quede fija al hacer scroll */
+    top: 0; /* Se pega al borde superior */
+    height: 100vh; /* Ocupa el 100% de la altura del viewport */
+    overflow-y: auto; /* Permite scroll vertical si el contenido de la sidebar es largo */
+    padding-top: 0; /* Ajuste de padding */
+}
+
+.main-content {
+    flex-grow: 1; /* El contenido principal ocupa todo el espacio restante */
+    padding: 20px; /* Espaciado interno para el contenido principal */
+    overflow-y: auto; /* Permite scroll vertical si el contenido principal es largo */
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    margin-bottom: 20px; /* Añade un pequeño margen inferior para el contenido principal */
+}
+/* --- FIN REGLAS DE LAYOUT --- */
+
+
+/* --- Estilos Generales de Títulos de Contenido (Ahora TODOS serán azules) --- */
+/* Aplica a los H1 (ej: ¡Bienvenido!) y H2 (ej: Inventario de Productos, Crear Nueva Venta, Consultar Ventas)
+   dentro del área de contenido principal (.main-content). */
+.main-content h1,
+.main-content h2 {
+    color: #007bff; /* Color azul de Bootstrap para todos los títulos de contenido */
+    font-weight: 700; /* Negrita */
+    margin-bottom: 1.5rem; /* Espacio debajo de los títulos */
+}
+
+
+/* Estilos para el menú lateral (sidebar) - PROPIEDADES VISUALES */
+/* El color del título 'Menú Empleado' */
+.sidebar h2 {
+    color: white; /* Color blanco para el título del menú lateral, como en tus imágenes */
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+/* Estilos de los enlaces del menú lateral */
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    margin-bottom: 10px;
+}
+
+.sidebar ul li a {
+    color: white; /* Color del enlace normal (blanco) */
+    text-decoration: none;
+    padding: 10px 15px;
+    display: block;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar ul li a:hover,
+.sidebar ul li a.active {
+    background-color: #007bff; /* Color de realce (azul) al pasar el mouse o cuando está activo */
+    color: white; /* Asegura el texto blanco en hover/active */
+}
+
+/* Estilo para el botón "Cerrar Sesión" (usando la clase 'logout-button' del HTML) */
+.sidebar .logout-button {
+    background-color: #dc3545; /* Rojo de Bootstrap */
+    border-color: #dc3545; /* Asegura borde rojo */
+    color: white;
+    width: 100%;
+    margin-top: 20px;
+    padding: 10px;
+    text-align: center;
+    border-radius: 5px;
+    display: block;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar .logout-button:hover {
+    background-color: #c82333; /* Rojo más oscuro al pasar el mouse */
+    border-color: #c82333;
+}
+
+
+/* Estilos para las secciones de contenido (como 'Inventario de Productos' dentro de dashboard_employee.html) */
+.content-section {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px; /* Asegura espacio entre secciones */
+}
+
+/* Estilos para la tabla de productos (incluyendo la del dashboard y crear venta) */
+.product-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.product-table th,
+.product-table td {
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    text-align: left;
+}
+
+.product-table th {
+    background-color: #e9ecef;
+    font-weight: bold;
+}
+
+.product-table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.product-table button {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.product-table button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilos para la tabla del carrito (en Crear Nueva Venta) */
+.cart-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.cart-table th,
+.cart-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.cart-table th {
+    background-color: #f2f2f2;
+}
+
+.cart-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.cart-table button.remove-from-cart {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+
+.cart-table button.remove-from-cart:hover {
+    background-color: #c82333;
+}
+
+/* Estilos para el Modal de Detalles del Producto */
+.modal {
+    display: flex;
+    visibility: hidden;
+    opacity: 0;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 8px;
+    position: relative;
+    transform: translateY(-50px);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.modal.show .modal-content {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.close-button {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#product-details-content p {
+    margin-bottom: 8px;
+    font-size: 1.1em;
+}
+
+#product-details-content strong {
+    color: #333;
+}
+
+#detail-description {
+    white-space: normal;
+    word-break: break-all;
+    font-style: italic;
+    color: #555;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    max-height: 150px;
+    overflow-y: auto;
+}

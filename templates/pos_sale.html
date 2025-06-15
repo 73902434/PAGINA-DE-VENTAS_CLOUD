@@ -1,0 +1,565 @@
+{# templates/pos_sale.html #}
+{% extends "base.html" %}
+
+{% block title %}Punto de Venta{% endblock %}
+
+{% block main_class %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='empleado_style.css') }}">
+<style>
+    /* Estilos básicos para autocompletado y formularios si no están en empleado_style.css */
+    .autocomplete-results {
+        border: 1px solid #ddd;
+        max-height: 200px;
+        overflow-y: auto;
+        background-color: #fff;
+        position: absolute;
+        z-index: 1000;
+        width: calc(100% - 2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        /* Añade top y left para posicionamiento exacto */
+        top: 100%;
+        /* Posiciona justo debajo del input, asumiendo que el input es el 0% de su padre relativo */
+        left: 0;
+    }
+
+    .autocomplete-result-item {
+        padding: 10px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+    }
+
+    .autocomplete-result-item:hover {
+        background-color: #f0f0f0;
+    }
+
+    .autocomplete-results div:last-child {
+        border-bottom: none;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+        /* --- ¡AQUÍ ESTÁ LA CORRECCIÓN DE POSICIONAMIENTO! --- */
+        position: relative;
+        /* Haz que este sea el contenedor de posicionamiento para los resultados */
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    .button.small {
+        padding: 5px 10px;
+        font-size: 0.85em;
+    }
+
+    .button.secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .button.secondary:hover {
+        background-color: #5a6268;
+    }
+
+    /* Añadir estilos para el total del carrito si aún no lo tienes */
+    .cart-summary td {
+        font-size: 1.1em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <h2>Menú Empleado</h2>
+        <ul>
+            <li class="sidebar-item">
+                <a href="{{ url_for('employee_dashboard_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'employee_dashboard_view' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Consultar Inventario</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('new_sale_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'new_sale_view' %}active{% endif %}">
+                    <i class="fa-solid fa-cash-register"></i>
+                    <span>Crear Nueva Venta</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('consult_sales_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'consult_sales_view' %}active{% endif %}">
+                    <i class="fa-solid fa-receipt"></i>
+                    <span>Ver y Buscar Ventas</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('consult_clients_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'consult_clients_view' %}active{% endif %}">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Consultar Clientes</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('add_client_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'add_client_view' %}active{% endif %}">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Añadir Nuevo Cliente</span>
+                </a>
+            </li>
+            {# Enlaces de perfil de usuario (aplican a ambos roles) #}
+            <li class="sidebar-item">
+                <a href="{{ url_for('my_profile_view') }}" class="sidebar-link">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Mi Perfil</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('change_password_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'change_password_view' %}active{% endif %}">
+                    <i class="fa-solid fa-key"></i>
+                    <span>Cambiar Contraseña</span>
+                </a>
+            </li>
+        </ul>
+        <p style="text-align: center; margin-top: 30px;"><a href="{{ url_for('logout') }}"
+                class="button secondary">Cerrar Sesión</a></p>
+    </aside>
+
+    <div class="main-content">
+        {% include 'messages.html' %}
+        <h1>Crear Nueva Venta</h1>
+        <p>Selecciona los productos para la venta actual.</p>
+
+        <div class="content-section">
+            <h2>Productos Disponibles</h2>
+            {% if products %}
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>${{ "%.2f"|format(product.price) }}</td>
+                        <td id="stock-{{ product.id }}">{{ product.stock }}</td>
+                        <td>
+                            <button class="add-to-cart-button" data-product-id="{{ product.id }}"
+                                data-product-name="{{ product.name }}" data-product-price="{{ product.price }}">
+                                Añadir al Carrito
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No hay productos disponibles en este momento.</p>
+            {% endif %}
+        </div>
+
+        <div class="content-section">
+            <h3>Venta Actual (Carrito)</h3>
+            <div id="current-sale-details">
+                {# Aquí es donde el JavaScript insertará la tabla del carrito #}
+                <p>Tu carrito está vacío.</p>
+            </div>
+            <div id="cart-total-display" style="text-align: right; font-weight: bold; margin-top: 10px;">
+                Total: $0.00
+            </div>
+        </div>
+
+        {# --- INICIO DE NUEVA SECCIÓN: DATOS DEL CLIENTE Y VENTA (Inicialmente oculto) --- #}
+        <div id="client-sale-section-wrapper" style="display: none;">
+            <div class="content-section mt-4">
+                <h2>Datos del Cliente y Venta</h2>
+                <div class="form-group" id="client-search-section">
+                    <label for="client-search">Buscar Cliente (Nombre o DNI):</label>
+                    <input type="text" id="client-search" class="form-control"
+                        placeholder="Escribe para buscar cliente existente..." autocomplete="off">
+                    <div id="client-search-results" class="autocomplete-results" style="display: none;">
+                    </div>
+                    <input type="hidden" id="client-id" name="client_id" value="">
+                    {# Changed button to a link to redirect to the new client page #}
+                    <a href="{{ url_for('add_client_view') }}" id="add-new-client-button"
+                        class="button secondary small mt-2">Añadir Nuevo Cliente</a>
+                </div>
+
+                <div id="client-details-display" style="display: none;">
+                    <h3>Cliente Seleccionado: <span id="selected-client-name"></span></h3>
+                    <p>DNI: <span id="selected-client-dni"></span></p>
+                    <p>Dirección: <span id="selected-client-address"></span></p>
+                    <p>Teléfono: <span id="selected-client-phone"></span></p>
+                    <p>Email: <span id="selected-client-email"></span></p>
+                    <button type="button" id="clear-client-button" class="button secondary small">Cambiar
+                        Cliente</button>
+                </div>
+
+                <hr>
+
+                {# --- ELIMINADA LA SECCIÓN DE AÑADIR NUEVO CLIENTE EN LÍNEA --- #}
+                {# La sección con id="new-client-form" y sus contenidos han sido eliminados #}
+
+                <div class="form-group mt-3">
+                    <label for="payment-method">Método de Pago:</label>
+                    <select id="payment-method" name="payment_method" class="form-control">
+                        <option value="Efectivo">Efectivo</option>
+                        <option value="Tarjeta">Tarjeta de Crédito/Débito</option>
+                        <option value="Transferencia">Transferencia Bancaria</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="sale-notes">Notas de la Venta (Opcional):</label>
+                    <textarea id="sale-notes" name="sale_notes" class="form-control" rows="3"
+                        placeholder="Notas adicionales sobre la venta..."></textarea>
+                </div>
+
+                <button type="button" id="finalize-sale-button" class="button primary mt-3" disabled>Finalizar
+                    Venta</button>
+            </div>
+        </div> {# FIN DE NUEVA SECCIÓN: client-sale-section-wrapper #}
+    </div> {# Fin main-content #}
+</div> {# Fin dashboard-layout #}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addProductButtons = document.querySelectorAll('.add-to-cart-button');
+        const currentSaleDetailsDiv = document.getElementById('current-sale-details');
+        const cartTotalDisplay = document.getElementById('cart-total-display');
+        const finalizeSaleButton = document.getElementById('finalize-sale-button');
+        const clientSearchInput = document.getElementById('client-search');
+        const clientSearchResults = document.getElementById('client-search-results');
+        const clientIdInput = document.getElementById('client-id');
+        const clientDetailsDisplay = document.getElementById('client-details-display');
+        const selectedClientNameSpan = document.getElementById('selected-client-name');
+        const selectedClientDniSpan = document.getElementById('selected-client-dni');
+        const selectedClientAddressSpan = document.getElementById('selected-client-address');
+        const selectedClientPhoneSpan = document.getElementById('selected-client-phone');
+        const selectedClientEmailSpan = document.getElementById('selected-client-email');
+        const clearClientButton = document.getElementById('clear-client-button');
+        const paymentMethodSelect = document.getElementById('payment-method'); // Get reference to the select element
+        const saleNotesTextarea = document.getElementById('sale-notes');
+
+        // --- NUEVA CONSTANTE: Wrapper para la sección de cliente y venta ---
+        const clientSaleSectionWrapper = document.getElementById('client-sale-section-wrapper');
+
+        let currentCart = {{ current_cart| tojson }}; // Carga el carrito inicial de Flask
+
+    // --- Funciones de Utilidad ---
+    function updateFinalizeButtonState() {
+        const isCartEmpty = currentCart.length === 0;
+        const isClientSelected = clientIdInput.value !== '';
+        // const isNewClientFormFilled = newClientForm.style.display !== 'none' && newClientFullNameInput.value.trim() !== ''; // REMOVED
+
+        // The condition now only relies on the cart not being empty AND a client being selected
+        if (!isCartEmpty && isClientSelected) {
+            finalizeSaleButton.disabled = false;
+        } else {
+            finalizeSaleButton.disabled = true;
+        }
+    }
+
+    function clearClientSelection() {
+        clientIdInput.value = '';
+        clientSearchInput.value = '';
+        clientDetailsDisplay.style.display = 'none';
+        document.getElementById('client-search-section').style.display = 'block'; // Mostrar la sección de búsqueda
+        clientSearchResults.style.display = 'none'; // Ocultar resultados de búsqueda
+        updateFinalizeButtonState();
+    }
+
+    // --- Funciones de Carrito ---
+
+    // Event listener para los botones de "Añadir al Carrito"
+    addProductButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const productId = this.dataset.productId;
+            const productName = this.dataset.productName;
+            const productPrice = parseFloat(this.dataset.productPrice);
+            addToCart(productId, productName, productPrice);
+        });
+    });
+
+    // Event listener para los botones "Eliminar" del carrito (delegación de eventos)
+    currentSaleDetailsDiv.addEventListener('click', function (event) {
+        if (event.target.classList.contains('remove-from-cart')) {
+            const productIdToRemove = event.target.dataset.productId;
+            removeFromCart(productIdToRemove);
+        }
+    });
+
+    // Event listener para el botón "Finalizar Venta"
+    finalizeSaleButton.addEventListener('click', function () {
+        if (currentCart.length === 0) {
+            alert('El carrito está vacío. No se puede finalizar la venta.');
+            return;
+        }
+
+        // The button is disabled if no client is selected, so this check is redundant for UI,
+        // but good for explicit safety.
+        if (!clientIdInput.value) {
+            alert('Por favor, selecciona un cliente existente para finalizar la venta.');
+            return;
+        }
+
+        if (confirm('¿Estás seguro de que quieres finalizar esta venta?')) {
+            finalizeSale();
+        }
+    });
+
+    function addToCart(productId, productName, productPrice) {
+        fetch('/add_to_cart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ product_id: productId, product_name: productName, product_price: productPrice, quantity: 1 }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    currentCart = data.cart; // Actualiza el carrito global
+                    updateCurrentSaleSection(currentCart);
+                    // updateFinalizeButtonState(); // Ya se llama dentro de updateCurrentSaleSection
+
+                    if (data.new_stock !== undefined && data.product_id !== undefined) {
+                        const stockElement = document.getElementById(`stock-${data.product_id}`);
+                        if (stockElement) {
+                            stockElement.textContent = data.new_stock;
+                        }
+                    }
+                } else {
+                    alert('Error al añadir al carrito: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error de conexión al añadir al carrito.');
+            });
+    }
+
+    function removeFromCart(productId) {
+        fetch('/remove_from_cart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ product_id: productId }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    currentCart = data.cart; // Actualiza el carrito global
+                    updateCurrentSaleSection(currentCart);
+                    // updateFinalizeButtonState(); // Ya se llama dentro de updateCurrentSaleSection
+
+                    if (data.new_stock !== undefined && data.product_id !== undefined) {
+                        const stockElement = document.getElementById(`stock-${data.product_id}`);
+                        if (stockElement) {
+                            stockElement.textContent = data.new_stock;
+                        }
+                    }
+                } else {
+                    alert('Error al eliminar del carrito: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error de conexión al eliminar del carrito.');
+            });
+    }
+
+    // --- Función para actualizar la sección de venta actual (carrito) ---
+    function updateCurrentSaleSection(cart) {
+        let htmlContent = '';
+        let total = 0;
+
+        if (cart && cart.length > 0) {
+            htmlContent += '<table class="cart-table">';
+            htmlContent += `<thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cant.</th>
+                                    <th>Precio/U.</th>
+                                    <th>Subtotal</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>`;
+            htmlContent += '<tbody>';
+
+            cart.forEach(item => {
+                const subtotal = item.product_price * item.quantity;
+                total += subtotal;
+                htmlContent += `
+                                <tr>
+                                    <td>${item.product_name}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>$${item.product_price.toFixed(2)}</td>
+                                    <td>$${subtotal.toFixed(2)}</td>
+                                    <td><button type="button" class="button remove-from-cart" data-product-id="${item.product_id}">Eliminar</button></td>
+                                </tr>
+                                `;
+            });
+
+            htmlContent += `</tbody>
+                            </table>`;
+            clientSaleSectionWrapper.style.display = 'block'; // MOSTRAR LA SECCIÓN DE CLIENTE/VENTA
+        } else {
+            htmlContent = '<p>Tu carrito está vacío.</p>';
+            clientSaleSectionWrapper.style.display = 'none'; // OCULTAR LA SECCIÓN DE CLIENTE/VENTA
+            clearClientSelection(); // Limpiar también la selección de cliente si el carrito se vacía
+            paymentMethodSelect.value = 'Efectivo'; // Restablecer método de pago
+            saleNotesTextarea.value = ''; // Limpiar notas
+        }
+
+        currentSaleDetailsDiv.innerHTML = htmlContent;
+        cartTotalDisplay.textContent = `Total: $${total.toFixed(2)}`;
+        updateFinalizeButtonState(); // Asegura que el botón se actualice cuando el carrito cambie
+    }
+
+    // --- Funciones y Eventos de Cliente ---
+
+    // Función para seleccionar un cliente de los resultados de búsqueda
+    function selectClient(client) {
+        clientIdInput.value = client.id;
+        selectedClientNameSpan.textContent = client.full_name;
+        selectedClientDniSpan.textContent = client.dni;
+        selectedClientAddressSpan.textContent = client.address;
+        selectedClientPhoneSpan.textContent = client.phone;
+        selectedClientEmailSpan.textContent = client.email;
+
+        document.getElementById('client-search-section').style.display = 'none'; // Ocultar búsqueda
+        clientDetailsDisplay.style.display = 'block'; // Mostrar detalles del cliente
+        clientSearchResults.style.display = 'none'; // Ocultar lista de resultados
+        updateFinalizeButtonState();
+    }
+
+    // Búsqueda de clientes (autocompletado con debounce)
+    let searchTimeout;
+    clientSearchInput.addEventListener('input', function () {
+        clearTimeout(searchTimeout);
+        const query = this.value.trim();
+        if (query.length < 2) {
+            clientSearchResults.style.display = 'none';
+            clientSearchResults.innerHTML = '';
+            clientIdInput.value = ''; // Limpiar ID de cliente si la búsqueda es muy corta
+            updateFinalizeButtonState();
+            return;
+        }
+
+        searchTimeout = setTimeout(() => {
+            fetch(`/clients/search?query=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    clientSearchResults.innerHTML = '';
+                    if (data.success && data.clients.length > 0) {
+                        data.clients.forEach(client => {
+                            const div = document.createElement('div');
+                            div.classList.add('autocomplete-result-item');
+                            div.textContent = `${client.full_name} (${client.dni || 'N/A'})`;
+                            div.addEventListener('click', () => selectClient(client));
+                            clientSearchResults.appendChild(div);
+                        });
+                        clientSearchResults.style.display = 'block';
+                    } else {
+                        const div = document.createElement('div');
+                        div.classList.add('autocomplete-result-item');
+                        div.textContent = 'No se encontraron clientes.';
+                        clientSearchResults.appendChild(div);
+                        clientSearchResults.style.display = 'block';
+                        clientIdInput.value = ''; // Limpiar ID de cliente si no hay resultados
+                        updateFinalizeButtonState();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al buscar clientes:', error);
+                    clientSearchResults.innerHTML = '<div class="autocomplete-result-item">Error al buscar.</div>';
+                    clientSearchResults.style.display = 'block';
+                    clientIdInput.value = '';
+                    updateFinalizeButtonState();
+                });
+        }, 300); // Retraso de 300ms
+    });
+
+    // Clic fuera de los resultados de búsqueda para ocultarlos
+    document.addEventListener('click', function (event) {
+        if (!clientSearchInput.contains(event.target) && !clientSearchResults.contains(event.target)) {
+            clientSearchResults.style.display = 'none';
+        }
+    });
+
+    // Botón "Cambiar Cliente"
+    clearClientButton.addEventListener('click', clearClientSelection);
+
+    // --- Función para finalizar la venta ---
+    function finalizeSale() {
+        if (currentCart.length === 0) {
+            alert('El carrito está vacío. No se puede finalizar la venta.');
+            return;
+        }
+
+        const saleData = {
+            cart: currentCart,
+            // *** ESTA ES LA LÍNEA CLAVE MODIFICADA/AÑADIDA ***
+            payment_method: paymentMethodSelect.value, // Obtiene el valor seleccionado del <select>
+            // ***********************************************
+            sale_notes: saleNotesTextarea.value,
+        };
+
+        if (clientIdInput.value) { // Cliente existente seleccionado
+            saleData.client_id = clientIdInput.value;
+        } else { // No hay cliente seleccionado
+            alert('Por favor, selecciona un cliente existente para finalizar la venta.');
+            return;
+        }
+
+        // Si todo está bien, envía los datos a Flask
+        fetch('/finalize_sale', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(saleData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    currentCart = []; // Vaciar el carrito localmente
+                    updateCurrentSaleSection(currentCart); // Actualizar la UI del carrito y ocultar sección de cliente/venta
+                    clearClientSelection(); // Limpiar la sección de cliente
+                    paymentMethodSelect.value = 'Efectivo'; // Restablecer método de pago
+                    saleNotesTextarea.value = ''; // Limpiar notas
+                    // Opcional: Redirigir o mostrar un mensaje de éxito con detalles de la venta
+                    // window.location.href = data.redirect_url || '/employee/new_sale'; // Puedes redirigir a una página de éxito
+                } else {
+                    alert('Error al finalizar la venta: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error de conexión al servidor al finalizar la venta.');
+            });
+    }
+
+    // Llama a updateCurrentSaleSection al cargar la página con el carrito inicial
+    // Asegúrate de que `current_cart` esté disponible en el contexto de Jinja
+    updateCurrentSaleSection(currentCart);
+    }); // Fin de DOMContentLoaded
+</script>
+{% endblock %}

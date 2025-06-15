@@ -1,0 +1,544 @@
+{# templates/manage_products.html #}
+{% extends "base.html" %}
+
+{% block title %}Gestionar Productos{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='empleado_style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='admin_style.css') }}">
+<style>
+    /* Estilos específicos para la gestión de productos */
+    .product-management-container {
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .product-form,
+    .product-list-section {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+
+    .product-form h3,
+    .product-list-section h3 {
+        color: #333;
+        margin-bottom: 20px;
+        text-align: center;
+        font-size: 1.5em;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #555;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 1em;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    .btn-submit {
+        background-color: #28a745;
+        /* Verde para añadir */
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+        width: 100%;
+    }
+
+    .btn-submit:hover {
+        background-color: #218838;
+    }
+
+    .btn-edit,
+    .btn-delete {
+        padding: 6px 12px;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9em;
+        margin-left: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-edit {
+        background-color: #007bff;
+        /* Azul para editar */
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-delete {
+        background-color: #dc3545;
+        /* Rojo para eliminar */
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background-color: #c82333;
+    }
+
+    /* Tabla de productos */
+    .product-table-container {
+        overflow-x: auto;
+    }
+
+    .product-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .product-table th,
+    .product-table td {
+        border: 1px solid #e0e0e0;
+        padding: 12px 15px;
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    .product-table th {
+        background-color: #f2f2f2;
+        color: #333;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.9em;
+    }
+
+    .product-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .product-table tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    /* ********************************************* */
+    /* ESTILOS EXCLUSIVOS PARA EL MODAL DE EDICIÓN DE PRODUCTOS */
+    /* Estas clases son ÚNICAS para este modal y no deben causar conflictos */
+    /* ********************************************* */
+
+    .product-edit-modal {
+        /* Fondo del modal */
+        display: flex;
+        /* Usamos flexbox para centrar el contenido */
+        align-items: center;
+        /* Centrar verticalmente */
+        justify-content: center;
+        /* Centrar horizontalmente */
+        position: fixed;
+        z-index: 1000;
+        /* Asegura que esté por encima de otros elementos */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        /* Fondo semi-transparente */
+        visibility: hidden;
+        /* Oculto por defecto */
+        opacity: 0;
+        /* Opacidad para la transición */
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        /* Transición suave */
+        overflow: auto;
+        /* Permite scroll si el contenido es demasiado grande */
+    }
+
+    .product-edit-modal.is-active {
+        /* Clase que activa la visibilidad del modal */
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .product-edit-modal-content {
+        /* Contenido del modal */
+        background-color: #fefefe;
+        padding: 30px;
+        border: 1px solid #888;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        position: relative;
+        transform: translateY(-50px);
+        /* Efecto de entrada: empieza un poco arriba */
+        opacity: 0;
+        /* Efecto de entrada: empieza invisible */
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        /* Transición para el contenido */
+    }
+
+    .product-edit-modal.is-active .product-edit-modal-content {
+        /* Animación del contenido cuando el modal está activo */
+        transform: translateY(0);
+        /* Vuelve a su posición original */
+        opacity: 1;
+        /* Se hace completamente visible */
+    }
+
+    .product-edit-modal-content .close-button {
+        /* Botón de cerrar dentro del modal */
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .product-edit-modal-content .close-button:hover,
+    .product-edit-modal-content .close-button:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    /* Estilo para campos de solo lectura */
+    .form-control-readonly {
+        background-color: #e9ecef;
+        /* Un color de fondo gris claro */
+        cursor: not-allowed;
+        /* Indicador de que no se puede editar */
+        width: 100%;
+        /* Asegurarse de que tenga el mismo ancho */
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 1em;
+    }
+
+    /* Media Queries para responsividad */
+    @media (max-width: 768px) {
+
+        .product-form,
+        .product-list-section {
+            padding: 15px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group textarea {
+            font-size: 0.9em;
+        }
+
+        .btn-submit {
+            padding: 10px 15px;
+            font-size: 0.9em;
+        }
+
+        .product-table th,
+        .product-table td {
+            padding: 8px 10px;
+            font-size: 0.85em;
+        }
+
+        .product-table thead {
+            display: none;
+        }
+
+        .product-table tr {
+            display: block;
+            margin-bottom: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .product-table td::before {
+            content: attr(data-label);
+            float: left;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .product-edit-modal-content {
+            /* La media query también aplica a la nueva clase */
+            width: 95%;
+            padding: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h2>Menú Administrador</h2>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin_dashboard_view') }}" class="sidebar-link">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <span>Dashboard Principal</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('manage_products_view') }}" class="sidebar-link active">
+                    <i class="fa-solid fa-boxes"></i>
+                    <span>Gestionar Productos</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('manage_users_view') }}" class="sidebar-link">
+                    <i class="fa-solid fa-users-cog"></i>
+                    <span>Gestionar Usuarios</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin_boletas_reports_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'admin_boletas_reports_view' %}active{% endif %}">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    <span>Reportes y Boletas</span>
+                </a>
+            </li>
+
+        </ul>
+        <p style="text-align: center; margin-top: 30px;"><a href="{{ url_for('logout') }}"
+                class="button secondary">Cerrar Sesión</a></p>
+    </aside>
+    <div class="main-content">
+        <main class="content px-3 py-4">
+            <div class="container-fluid product-management-container">
+                {% include 'messages.html' %}
+
+                <div class="product-form">
+                    <h3>Añadir Nuevo Producto</h3>
+                    <form action="{{ url_for('manage_products_view') }}" method="POST">
+                        <input type="hidden" name="action" value="add">
+                        <div class="form-group">
+                            <label for="name">Nombre del Producto:</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Descripción:</label>
+                            <textarea id="description" name="description" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="price">Precio:</label>
+                            <input type="number" id="price" name="price" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="stock">Stock:</label>
+                            <input type="number" id="stock" name="stock" min="0" required>
+                        </div>
+                        <button type="submit" class="btn-submit">Añadir Producto</button>
+                    </form>
+                </div>
+
+                <div class="product-list-section">
+                    <h3>Lista de Productos</h3>
+                    {% if products %}
+                    <div class="product-table-container">
+                        <table class="product-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                    <th>Precio</th>
+                                    <th>Stock</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in products %}
+                                <tr>
+                                    <td data-label="ID">{{ product.id }}</td>
+                                    <td data-label="Nombre">{{ product.name }}</td>
+                                    <td data-label="Descripción">{{ product.description }}</td>
+                                    <td data-label="Precio">S/. {{ "%.2f"|format(product.price) }}</td>
+                                    <td data-label="Stock">{{ product.stock }}</td>
+                                    <td data-label="Acciones">
+                                        <button class="btn-edit" data-id="{{ product.id }}"
+                                            data-name="{{ product.name }}" data-description="{{ product.description }}"
+                                            data-price="{{ product.price }}" data-stock="{{ product.stock }}">
+                                            Editar
+                                        </button>
+                                        <form action="{{ url_for('manage_products_view') }}" method="POST"
+                                            style="display:inline-block; margin-left: 5px;">
+                                            <input type="hidden" name="action" value="delete">
+                                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                                            <button type="submit" class="btn-delete"
+                                                onclick="return confirm('¿Estás seguro de que quieres eliminar este producto?');">Eliminar</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p style="text-align: center;">No hay productos registrados aún.</p>
+                    {% endif %}
+                </div>
+
+            </div> {# Cierra el container-fluid #}
+        </main>
+    </div> {# Cierra el main-content #}
+</div> {# Cierra el dashboard-layout #}
+
+<div id="editProductModal" class="product-edit-modal">
+    <div class="product-edit-modal-content">
+        <span class="close-button">&times;</span>
+        <h3>Editar Producto</h3>
+        <form action="{{ url_for('manage_products_view') }}" method="POST"> {# CORRECCIÓN: Apunta a manage_products_view
+            #}
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" id="edit-product-id" name="product_id">
+
+            <div class="form-group">
+                <label for="edit-display-id">ID del Producto:</label>
+                <input type="text" id="edit-display-id" readonly class="form-control-readonly">
+            </div>
+
+            <div class="form-group">
+                <label for="edit-name">Nombre del Producto:</label>
+                <input type="text" id="edit-name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="edit-description">Descripción:</label>
+                <textarea id="edit-description" name="description" rows="3"></textarea> {# Descripción no es requerida
+                en la edición #}
+            </div>
+            <div class="form-group">
+                <label for="edit-price">Precio:</label>
+                <input type="number" id="edit-price" name="price" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-stock">Stock:</label>
+                <input type="number" id="edit-stock" name="stock" min="0" required>
+            </div>
+
+            <button type="submit" class="btn-submit">Guardar Cambios</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %} {# Cierra el block content #}
+
+{# Mover el script al final del body para asegurar que el DOM está cargado #}
+{% block scripts %}
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('--- Script de manage_products.html INICIANDO (DOMContentLoaded) ---');
+
+        // Seleccionamos el modal por su ID
+        const modal = document.getElementById('editProductModal');
+        // Seleccionamos el botón de cerrar DENTRO del nuevo contenedor del modal
+        const closeButtons = document.querySelectorAll('.product-edit-modal-content .close-button');
+        const editButtons = document.querySelectorAll('.btn-edit');
+
+        console.log('Modal element (editProductModal):', modal);
+        console.log('Close buttons found (count):', closeButtons.length);
+        console.log('Número de botones de editar encontrados:', editButtons.length);
+
+        // Función para mostrar el modal - ¡Ahora usa la nueva clase 'is-active'!
+        function showModal() {
+            if (modal) {
+                modal.classList.add('is-active');
+                console.log('Modal ahora debería ser visible (usando clase "is-active").');
+            } else {
+                console.error("Error: El modal de edición no se encontró al intentar mostrarlo (variable 'modal' es null).");
+            }
+        }
+
+        // Función para ocultar el modal - ¡Ahora remueve la nueva clase 'is-active'!
+        function hideModal() {
+            if (modal) {
+                modal.classList.remove('is-active');
+                console.log('Modal ahora debería estar oculto (removiendo clase "is-active").');
+            }
+        }
+
+        // Asignar eventos a los botones de editar
+        if (editButtons.length > 0) {
+            editButtons.forEach(button => {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault(); // Previene el comportamiento por defecto del botón
+                    console.log('Botón EDITAR clickeado. ID del producto:', this.dataset.id);
+
+                    const productId = this.dataset.id;
+                    const productName = this.dataset.name;
+                    const productDescription = this.dataset.description;
+                    const productPrice = this.dataset.price;
+                    const productStock = this.dataset.stock;
+
+                    // Rellenar los campos del modal
+                    const editProductIdField = document.getElementById('edit-product-id');
+                    const editDisplayIdField = document.getElementById('edit-display-id');
+                    const editNameField = document.getElementById('edit-name');
+                    const editDescriptionField = document.getElementById('edit-description');
+                    const editPriceField = document.getElementById('edit-price');
+                    const editStockField = document.getElementById('edit-stock');
+
+                    // Asegúrate de que los elementos existen antes de intentar asignarles un valor
+                    if (editProductIdField) editProductIdField.value = productId; else console.error("Campo 'edit-product-id' no encontrado.");
+                    if (editDisplayIdField) editDisplayIdField.value = productId; else console.error("Campo 'edit-display-id' no encontrado.");
+                    if (editNameField) editNameField.value = productName; else console.error("Campo 'edit-name' no encontrado.");
+                    if (editDescriptionField) editDescriptionField.value = productDescription; else console.error("Campo 'edit-description' no encontrado.");
+                    if (editPriceField) editPriceField.value = productPrice; else console.error("Campo 'edit-price' no encontrado.");
+                    if (editStockField) editStockField.value = productStock; else console.error("Campo 'edit-stock' no encontrado.");
+
+                    showModal();
+                });
+            });
+        } else {
+            console.warn("Advertencia: No se encontraron botones de editar con la clase '.btn-edit'. Asegúrate de que estén en el HTML.");
+        }
+
+        // Asignar evento al botón de cerrar del modal
+        if (closeButtons.length > 0) {
+            closeButtons.forEach(button => {
+                button.addEventListener('click', hideModal);
+            });
+        } else {
+            console.error("Error: No se encontraron botones de cerrar del modal con la clase '.close-button' dentro de '.product-edit-modal-content'.");
+        }
+
+        // Cerrar modal al hacer clic fuera del contenido del modal
+        window.addEventListener('click', function (event) {
+            if (event.target === modal) {
+                hideModal();
+            }
+        });
+
+        console.log('--- Script de manage_products.html FINALIZADO (DOMContentLoaded) ---');
+    });
+</script>
+{% endblock %} {# Cierra el block scripts #}

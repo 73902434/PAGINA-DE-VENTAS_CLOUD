@@ -1,0 +1,170 @@
+/* static/style.css - Archivo CSS Principal (GLOBAL) */
+
+/* Asegura que html ocupe el 100% de la altura */
+html {
+    height: 100%; 
+}
+*{
+    box-sizing: border-box; /* Añadir esta línea */
+}
+/* Estilos generales del cuerpo */
+body {
+    font-family: Arial, sans-serif;
+    /* background-color: #f4f7f6; */ /* ¡COMENTADA O ELIMINADA ESTA LÍNEA! */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column; /* Apilar el contenido principal y el footer verticalmente */
+    height: 100vh;         
+    color: #333;
+}
+/* MODIFICACIÓN: La etiqueta <main> ahora solo crece para ocupar espacio, no es un contenedor visual */
+main {
+    flex-grow: 1;
+    padding: 0; /* Aseguramos que no haya padding global en main */
+    width: 100%; /* Aseguramos que ocupe el 100% del ancho disponible */
+    overflow-y: auto;
+}
+
+.page-content-wrapper {
+    background-color: #ffffff; /* Fondo blanco */
+    padding: 40px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    text-align: center; /* Centra el texto dentro de este contenedor */
+    max-width: 800px; /* Ancho máximo para este contenedor (similar a como estaba main antes) */
+    width: 90%; /* Ancho responsivo */
+    margin: 20px auto; /* Centrar este contenedor en la página */
+    display: flex; /* Para organizar el contenido interno si es necesario */
+    flex-direction: column;
+    align-items: center; /* Centrar contenido horizontalmente dentro de este contenedor */
+    justify-content: center; /* Centrar contenido verticalmente dentro de este contenedor */
+}
+
+/* Títulos */
+h1 {
+    color: #007bff; /* Color azul para los títulos */
+    margin-bottom: 25px;
+    font-size: 2em;
+}
+
+/* Estilos para formularios */
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group input[type="email"],
+.form-group input[type="number"],
+.form-group textarea {
+    width: calc(100% - 20px);
+    padding: 12px 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+/* Botones */
+.button {
+    background-color: #007bff;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+    text-decoration: none;
+    margin-top: 15px;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
+.button.secondary {
+    background-color: #6c757d; /* Gris secundario */
+}
+
+.button.secondary:hover {
+    background-color: #5a6268;
+}
+
+/* Mensajes flash */
+.flashes {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 5px 0;
+    text-align: left;
+}
+
+.flashes li {
+    padding: 8px 15px;
+    margin-bottom: 0px;
+    border-radius: 5px;
+    font-size: 0.85em;
+    display: flex;
+    align-items: center;
+}
+
+.flashes .success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.flashes .danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.flashes .info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* Contenedor específico para login (dentro de .page-content-wrapper) */
+.login-container {
+    padding: 30px; /* Padding específico para el contenido del formulario de login */
+    border-radius: 8px;
+    background-color: #f9f9f9; /* Color de fondo para este contenedor interior, ¡puede que quieras que sea #fff si quieres el login blanco! */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); /* Sombra más suave */
+    width: 100%; /* Ocupa el 100% del padre (page-content-wrapper) hasta su max-width */
+    max-width: 400px; /* Ancho máximo específico para el formulario de login */
+    box-sizing: border-box;
+}
+
+
+/* Estilos del pie de página */
+footer {
+    margin-top: auto; /* Empujar el footer al final si el body es flex column */
+    font-size: 0.85em;
+    color: #777; /* Gris medio para el texto del footer */
+    width: 100%; /* Ocupar todo el ancho si el body es flex column */
+    padding: 10px 0;
+    background-color: #343a40; /* Fondo oscuro para el footer */
+    color: white;
+    text-align: center;
+}
+
+/* Estilos específicos para la sección de usuarios de prueba (en login.html) */
+.test-users-info {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    font-size: 0.9em;
+    color: #666;
+}

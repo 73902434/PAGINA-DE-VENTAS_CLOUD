@@ -1,0 +1,337 @@
+{# templates/my_profile.html - Extiende base.html #}
+{% extends "base.html" %}
+
+{% block title %}Mi Perfil{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='empleado_style.css') }}">
+<style>
+    /* Se han eliminado estilos de body, html, dashboard-layout, main-content, 
+    y todo lo relacionado con el sidebar y profile-card, 
+    ya que deben ser manejados por empleado_style.css y base.html.
+    */
+
+    /* ESTILOS ESPECÍFICOS PARA LA TARJETA DE PERFIL Y SU CONTENIDO */
+    .profile-card {
+        /* Mantén los estilos existentes de la tarjeta si no están en empleado_style.css */
+        background-color: #fff !important;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        max-width: 600px;
+        margin: 50px auto;
+        /* Esto centra la tarjeta horizontalmente */
+        text-align: center;
+        /* Esto centra el botón y el título de la tarjeta, lo cual es deseado */
+        color: #333 !important;
+    }
+
+    .profile-card h1 {
+        color: #333 !important;
+    }
+
+    /* CAMBIO AQUÍ: El texto dentro de .profile-info VUELVE a alinearse a la izquierda */
+    .profile-info {
+        text-align: left;
+        /* ANTES estaba en 'center', ahora vuelve a 'left' */
+        margin-top: 20px;
+    }
+
+    .profile-info p {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+        color: #333 !important;
+    }
+
+    .profile-info strong {
+        display: inline-block;
+        width: 120px;
+        /* Ancho para alinear las etiquetas */
+        color: #555 !important;
+    }
+
+    .btn-edit-profile {
+        margin-top: 20px;
+    }
+
+
+    /* ESTILOS DEL MODAL (DEBE SER BLANCO Y VISIBLE) */
+    .modal-content {
+        background-color: white !important;
+        color: #333 !important;
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        background-color: white !important;
+        color: #333 !important;
+        border-color: #dee2e6 !important;
+    }
+
+    .modal-title {
+        color: #333 !important;
+    }
+
+    .form-text-static {
+        padding-top: calc(0.375rem + 1px);
+        padding-bottom: calc(0.375rem + 1px);
+        margin-bottom: 0;
+        line-height: 1.5;
+        color: #6c757d !important;
+    }
+
+    .modal-body label {
+        color: #333 !important;
+    }
+
+    /* ************************************************* */
+    /* *** SOLUCIÓN CLAVE PARA EL FONDO OSCURO E INTERACCIÓN *** */
+    /* ************************************************* */
+    .modal-backdrop {
+        background-color: transparent !important;
+        pointer-events: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h2>Menú Empleado</h2>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="sidebar-item">
+                <a href="{{ url_for('employee_dashboard_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'employee_dashboard_view' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Consultar Inventario</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('new_sale_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'new_sale_view' %}active{% endif %}">
+                    <i class="fa-solid fa-cash-register"></i>
+                    <span>Crear Nueva Venta</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('consult_sales_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'consult_sales_view' %}active{% endif %}">
+                    <i class="fa-solid fa-receipt"></i>
+                    <span>Ver y Buscar Ventas</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('consult_clients_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'consult_clients_view' %}active{% endif %}">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Consultar Clientes</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('add_client_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'add_client_view' %}active{% endif %}">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Añadir Nuevo Cliente</span>
+                </a>
+            </li>
+            {# Enlaces de perfil de usuario #}
+            <li class="sidebar-item">
+                <a href="{{ url_for('my_profile_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'my_profile_view' %}active{% endif %}">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Mi Perfil</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('change_password_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'change_password_view' %}active{% endif %}">
+                    <i class="fa-solid fa-key"></i>
+                    <span>Cambiar Contraseña</span>
+                </a>
+            </li>
+
+            {# Enlaces específicos para ADMINISTRADORES - ELIMINADOS DE ESTA PLANTILLA #}
+        </ul>
+        <p style="text-align: center; margin-top: 30px;"><a href="{{ url_for('logout') }}"
+                class="button secondary">Cerrar Sesión</a></p>
+    </aside>
+    <div class="main-content">
+        <main class="content px-3 py-4">
+            <div class="container-fluid">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                <div class="profile-card">
+                    <h1>Mi Perfil</h1>
+                    {# Este bloque solo se muestra si la variable 'user_info' fue pasada desde Flask #}
+                    {% if user_info %}
+                    <div class="profile-info" id="current-profile-info"> {# Añadir ID para fácil actualización #}
+                        <p><strong>Usuario:</strong> <span id="display-username">{{ user_info.username }}</span></p>
+                        <p><strong>Nombre:</strong> <span id="display-first_name">{{ user_info.first_name }}</span></p>
+                        <p><strong>Apellido:</strong> <span id="display-last_name">{{ user_info.last_name }}</span></p>
+                        <p><strong>Teléfono:</strong> <span id="display-phone">{{ user_info.phone }}</span></p>
+                        <p><strong>Dirección:</strong> <span id="display-address">{{ user_info.address }}</span></p>
+                        <p><strong>Email:</strong> <span id="display-email">{{ user_info.email }}</span></p>
+                        <p><strong>DNI:</strong> <span id="display-dni">{{ user_info.dni }}</span></p>
+                        <p><strong>Rol:</strong> <span id="display-role">{{ user_info.role }}</span></p>
+                    </div>
+                    <button class="btn btn-primary btn-edit-profile" data-bs-toggle="modal"
+                        data-bs-target="#editProfileModal">Editar Perfil</button>
+                    {% else %}
+                    <p>No se pudo cargar la información del perfil. Asegúrate de haber iniciado sesión como empleado.
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+{# ***** INICIO DEL MODAL DE EDICIÓN DE PERFIL ***** #}
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProfileModalLabel">Editar Datos de Perfil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editProfileForm">
+                    <div class="mb-3">
+                        <label class="form-label">Usuario:</label>
+                        <p class="form-text-static" id="modal-username"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nombre:</label>
+                        <p class="form-text-static" id="modal-first_name"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Apellido:</label>
+                        <p class="form-text-static" id="modal-last_name"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="modal-phone" class="form-label">Teléfono:</label>
+                        <input type="text" class="form-control" id="modal-phone" name="phone">
+                    </div>
+                    <div class="mb-3">
+                        <label for="modal-address" class="form-label">Dirección:</label>
+                        <input type="text" class="form-control" id="modal-address" name="address">
+                    </div>
+                    <div class="mb-3">
+                        <label for="modal-email" class="form-label">Email:</label>
+                        <input type="email" class="form-control" id="modal-email" name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">DNI:</label>
+                        <p class="form-text-static" id="modal-dni"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rol:</label>
+                        <p class="form-text-static" id="modal-role"></p>
+                    </div>
+                    <input type="hidden" name="user_id" id="modal-user_id"> {# Campo oculto para el ID del usuario #}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="saveProfileChanges">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+{# ***** FIN DEL MODAL DE EDICIÓN DE PERFIL ***** #}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Lógica para el toggle del sidebar (botón de hamburguesa)
+        const toggler = document.querySelector('.toggle-btn');
+        const sidebar = document.querySelector('#sidebar');
+
+        if (toggler && sidebar) {
+            toggler.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+            });
+        }
+
+        // ***** Lógica para el Modal de Edición de Perfil *****
+        const editProfileModalElement = document.getElementById('editProfileModal');
+        const editProfileModal = new bootstrap.Modal(editProfileModalElement);
+
+        {% if user_info %}
+        const user_info = {
+            id: {{ user_info.id | tojson
+    }},
+        username: {{ user_info.username | tojson }},
+        first_name: {{ user_info.first_name | tojson }},
+        last_name: {{ user_info.last_name | tojson }},
+        phone: {{ user_info.phone | tojson }},
+        address: {{ user_info.address | tojson }},
+        email: {{ user_info.email | tojson }},
+        dni: {{ user_info.dni | tojson }},
+        role: {{ user_info.role | tojson }}
+        };
+
+    editProfileModalElement.addEventListener('show.bs.modal', function (event) {
+        document.getElementById('modal-user_id').value = user_info.id;
+        document.getElementById('modal-username').textContent = user_info.username;
+        document.getElementById('modal-first_name').textContent = user_info.first_name;
+        document.getElementById('modal-last_name').textContent = user_info.last_name;
+        document.getElementById('modal-dni').textContent = user_info.dni;
+        document.getElementById('modal-role').textContent = user_info.role;
+
+        document.getElementById('modal-phone').value = user_info.phone || '';
+        document.getElementById('modal-address').value = user_info.address || '';
+        document.getElementById('modal-email').value = user_info.email || '';
+    });
+
+    const saveProfileChangesButton = document.getElementById('saveProfileChanges');
+    saveProfileChangesButton.addEventListener('click', async () => {
+        const formData = new FormData();
+        formData.append('user_id', document.getElementById('modal-user_id').value);
+        formData.append('phone', document.getElementById('modal-phone').value);
+        formData.append('address', document.getElementById('modal-address').value);
+        formData.append('email', document.getElementById('modal-email').value);
+
+        try {
+            const response = await fetch('/update_my_profile', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                document.getElementById('display-phone').textContent = data.updated_info.phone;
+                document.getElementById('display-address').textContent = data.updated_info.address;
+                document.getElementById('display-email').textContent = data.updated_info.email;
+
+                alert('Perfil actualizado exitosamente!');
+                editProfileModal.hide();
+                window.location.reload();
+
+            } else {
+                alert('Error al actualizar el perfil: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error al enviar la solicitud:', error);
+            alert('Ocurrió un error de conexión al intentar actualizar el perfil.');
+        }
+    });
+    {% endif %}
+    });
+</script>
+{% endblock %}

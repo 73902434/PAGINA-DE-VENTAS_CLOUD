@@ -1,0 +1,340 @@
+/* static/admin_style.css */
+
+/* Estilos básicos para las "tarjetas" de contenido en el dashboard del administrador */
+.admin-card {
+    background-color: #fff !important;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin-bottom: 20px; /* Espacio entre las tarjetas */
+    color: #333 !important;
+    text-align: left; /* Alineación del texto por defecto dentro de la tarjeta */
+}
+
+.admin-card h2 {
+    color: #333 !important;
+    margin-bottom: 15px;
+    text-align: center; /* Centrar títulos dentro de las tarjetas */
+}
+
+.admin-dashboard-welcome {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333; /* Color de texto para el bloque de bienvenida */
+}
+
+.admin-dashboard-welcome h1 {
+    color: #333; /* Color de título para el bloque de bienvenida */
+}
+
+.admin-dashboard-welcome p {
+    color: #555; /* Color de párrafo para el bloque de bienvenida */
+}
+
+/* --- ESTILOS PARA EL RESUMEN DE ESTADÍSTICAS --- */
+.stats-grid {
+    display: grid;
+    /* Ajusta para tener 3 columnas en pantallas grandes, con un tamaño mínimo de 200px por columna */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px; /* Espacio entre los ítems */
+    margin-top: 20px;
+    /* Centrar la cuadrícula si hay menos elementos de los que caben en una fila completa */
+    justify-content: center; /* Alinea los elementos al centro horizontalmente */
+    align-items: stretch; /* Asegura que los elementos se estiren para ocupar la altura disponible, minimizando vacíos */
+}
+
+.stat-item {
+    background-color: #f8f9fa; /* Un fondo ligeramente diferente para destacar */
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px 20px; /* Reducir el padding interno para hacerlos más compactos */
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease-in-out; /* Pequeña animación al pasar el ratón */
+    
+    /* Control de altura y alineación del contenido */
+    min-height: 100px; /* Altura mínima para los cuadros de estadísticas */
+    display: flex; /* Usar flexbox para control de contenido */
+    flex-direction: column; /* Apilar elementos verticalmente */
+    justify-content: center; /* Centrar verticalmente el contenido */
+    align-items: center; /* Centrar horizontalmente el contenido */
+}
+
+.stat-item:hover {
+    transform: translateY(-3px); /* Levanta ligeramente la tarjeta al pasar el ratón */
+}
+
+.stat-item h3 {
+    margin-top: 0;
+    margin-bottom: 5px; /* Reducir el espacio debajo del título */
+    font-size: 1em; /* Tamaño de fuente para el título */
+    color: #555;
+}
+
+.stat-item p {
+    font-size: 1.6em; /* Tamaño de fuente más grande para los números/valores */
+    font-weight: bold;
+    color: #333;
+    margin: 0; /* Eliminar márgenes por defecto del párrafo para mayor compactación */
+}
+
+/* Estilo para el stat-item de bajo stock cuando hay alerta */
+.stat-item.danger {
+    background-color: #ffe0e0; /* Fondo rojo claro */
+    border-color: #ffb3b3;
+    color: #cc0000; /* Texto rojo oscuro */
+}
+.stat-item.danger p {
+    color: #cc0000; /* Asegurar que el número también sea rojo */
+}
+
+
+/* --- ESTILOS PARA LOS GRÁFICOS --- */
+.charts-section {
+    margin-top: 30px; /* Aumenta el margen superior para separar de las estadísticas */
+    padding: 20px;
+}
+
+.chart-grid {
+    display: grid;
+    /* Intenta siempre 2 columnas para los gráficos en pantallas medianas y grandes.
+       minmax(450px, 1fr) asegura que cada gráfico tenga un buen ancho. */
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 25px; /* Más espacio entre los gráficos */
+    /* CLAVE para centrar y alinear los cuadros en el grid */
+    justify-content: center; /* Centra los grupos de columnas si no ocupan todo el ancho */
+    align-items: start; /* Alinea los elementos al inicio de su celda (top), para que no queden huecos abajo */
+}
+
+.chart-item {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centra el contenido */
+    /* *** CLAVE PARA EL TAMAÑO DE LOS GRÁFICOS *** */
+    height: 380px; /* Altura fija para todos los contenedores de gráficos. */
+    max-height: 380px; /* Asegura que no crezca más allá */
+    overflow: hidden; /* Recorta cualquier contenido que se desborde */
+}
+
+.chart-item h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 1.2em;
+    text-align: center;
+}
+
+.chart-item canvas {
+    max-width: 100%; /* Asegura que el canvas no se desborde horizontalmente */
+    /* La altura del canvas debe ser manejada por Chart.js dentro del contenedor fijo */
+    height: auto; /* Permite a Chart.js ajustar la altura automáticamente */
+    width: auto; /* Permite a Chart.js ajustar el ancho automáticamente */
+    flex-grow: 1; /* Permite que el canvas ocupe el espacio disponible en flexbox */
+}
+
+/* --- ESTILOS PARA LA LISTA DE PRODUCTOS CON BAJO STOCK --- */
+.low-stock-list {
+    margin-top: 15px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    overflow: hidden; /* Para contener los bordes */
+}
+
+.low-stock-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.low-stock-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    background-color: #fff;
+    font-size: 0.95em;
+}
+
+.low-stock-list li:last-child {
+    border-bottom: none; /* Eliminar el borde inferior del último elemento */
+}
+
+.low-stock-list li span {
+    font-weight: 500;
+}
+
+.low-stock-list li span:first-child {
+    color: #444;
+}
+
+.low-stock-list li span:last-child {
+    color: #cc0000; /* Color rojo para el stock bajo */
+    font-weight: bold;
+}
+
+/* --- NUEVOS ESTILOS PARA LA SECCIÓN DE EMPLEADOS TOP POR PRODUCTO --- */
+
+/* Estilo para que la tarjeta ocupe todo el ancho disponible (usado en la nueva sección) */
+.admin-card.full-width-card {
+    grid-column: 1 / -1; /* Esto hace que ocupe todas las columnas en un grid padre si lo hay */
+    width: 100%; /* Asegura que ocupe el ancho completo de su contenedor */
+    margin-top: 30px; /* Aumenta el espacio superior para separarlo claramente de los gráficos */
+}
+
+/* Estilos para el grid de productos y empleados top */
+.product-employee-sales-grid {
+    display: grid;
+    /* Adapta las columnas. minmax(280px, 1fr) es un buen tamaño para estas tarjetas. */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px; /* Espacio entre las tarjetas de producto-empleado */
+    padding: 15px; /* Pequeño padding dentro del card principal */
+    background-color: #f9f9f9; /* Fondo ligero para la sección */
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    /* CLAVE para centrar y alinear los cuadros en el grid */
+    justify-content: center; /* Centra los grupos de columnas si no ocupan todo el ancho */
+    align-items: stretch; /* Asegura que los elementos se estiren para ocupar la altura disponible, minimizando vacíos */
+}
+
+/* Estilos para cada tarjeta individual de producto-empleado */
+.product-employee-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    text-align: center;
+    transition: transform 0.2s ease-in-out;
+    /* IMPORTANTE: Hacer que las tarjetas tengan una altura mínima si el contenido es muy poco */
+    min-height: 140px; /* Ajusta esta altura según el contenido más pequeño que esperes */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centra el contenido verticalmente */
+    align-items: center; /* Centra el contenido horizontalmente */
+}
+
+.product-employee-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.product-employee-card h4 {
+    margin-top: 0;
+    color: #333;
+    font-size: 1.1em;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+
+.product-employee-card p {
+    margin: 5px 0;
+    color: #555;
+    font-size: 0.95em;
+}
+
+.product-employee-card strong {
+    color: #007bff; /* Color para resaltar los datos importantes, puedes ajustarlo */
+}
+
+
+/* Media Queries para responsividad */
+@media (max-width: 992px) { /* Tablets y pantallas medianas */
+    /* Ajustes generales de padding y margin para hacer todo más compacto */
+    .admin-card {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .admin-card h2 {
+        font-size: 1.5em;
+        margin-bottom: 15px;
+    }
+
+    /* Stats Grid: Más compacto */
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); /* Más compacto para tablets */
+        gap: 10px; /* Reducir el espacio entre cuadros */
+    }
+    .stat-item {
+        padding: 10px 15px; /* Más padding reducido */
+        min-height: 90px; /* Ajusta la altura mínima para tablets */
+    }
+    .stat-item h3 {
+        font-size: 0.9em;
+    }
+    .stat-item p {
+        font-size: 1.4em;
+    }
+
+    /* Chart Grid: Se adapta a 1 o 2 columnas si no hay espacio */
+    .chart-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 15px;
+    }
+    .chart-item {
+        height: 350px; /* Altura ajustada para tablets */
+        max-height: 350px;
+        padding: 15px;
+    }
+    .chart-item h3 {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+    }
+
+    /* Product Employee Sales Grid: Más compacto */
+    .product-employee-sales-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 15px;
+    }
+    .product-employee-card {
+        padding: 15px;
+        min-height: 120px; /* Ajusta la altura mínima para tablets */
+    }
+    .product-employee-card h4 {
+        font-size: 1em;
+    }
+    .product-employee-card p {
+        font-size: 0.85em;
+    }
+}
+
+@media (max-width: 768px) { /* Móviles y pantallas pequeñas */
+    /* Ajustes generales de padding y margin */
+    .admin-card {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    .admin-dashboard-welcome h1 {
+        font-size: 2em;
+    }
+    .admin-dashboard-welcome p {
+        font-size: 1em;
+    }
+
+    /* Todos los grids a una sola columna */
+    .stats-grid,
+    .chart-grid,
+    .product-employee-sales-grid {
+        grid-template-columns: 1fr; /* Una sola columna para móviles */
+        gap: 15px;
+    }
+
+    /* Altura de gráficos aún más reducida para móviles */
+    .chart-item {
+        height: 300px; /* Altura reducida para móviles */
+        max-height: 300px;
+        padding: 10px;
+    }
+    .chart-item h3 {
+        font-size: 1em;
+        margin-bottom: 8px;
+    }
+    .product-employee-card {
+        min-height: 100px; /* Ajusta la altura mínima para móviles */
+    }
+}

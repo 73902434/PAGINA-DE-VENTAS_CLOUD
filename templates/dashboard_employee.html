@@ -1,0 +1,261 @@
+{# templates/dashboard_employee.html - Extiende base.html #}
+{% extends "base.html" %}
+
+{% block title %}Dashboard de Empleado{% endblock %}
+
+{% block extra_css %}
+{# **** CRÍTICO: Carga tu CSS específico del dashboard aquí **** #}
+<link rel="stylesheet" href="{{ url_for('static', filename='empleado_style.css') }}">
+
+{# ***** INICIO DE CORRECCIÓN CSS PARA FORZAR EL CIERRE DEL MODAL ***** #}
+<style>
+    /* Asegura que el telón de fondo tenga la opacidad y z-index correctos */
+    .modal-backdrop.show {
+        opacity: 0.5 !important;
+        z-index: 1040 !important;
+        /* Por debajo del modal (1050), pero por encima del contenido */
+        pointer-events: auto !important;
+        /* Asegura que se pueda interactuar (clics) */
+    }
+
+    /* Asegura que el modal esté siempre por encima del telón de fondo */
+    .modal.show {
+        z-index: 1050 !important;
+    }
+
+    /* Manejo del body cuando el modal está abierto para restaurar el scroll */
+    body.modal-open {
+        overflow: hidden !important;
+        padding-right: 0px !important;
+        /* Evita saltos si el scrollbar desaparece */
+    }
+</style>
+{# ***** FIN DE CORRECCIÓN CSS ***** #}
+
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <h2>Menú Empleado</h2>
+        <ul>
+            <li class="sidebar-item">
+                <a href="{{ url_for('employee_dashboard_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'employee_dashboard_view' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Consultar Inventario</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('new_sale_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'new_sale_view' %}active{% endif %}">
+                    <i class="fa-solid fa-cash-register"></i>
+                    <span>Crear Nueva Venta</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('consult_sales_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'consult_sales_view' %}active{% endif %}">
+                    <i class="fa-solid fa-receipt"></i>
+                    <span>Ver y Buscar Ventas</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('consult_clients_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'consult_clients_view' %}active{% endif %}">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Consultar Clientes</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('add_client_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'add_client_view' %}active{% endif %}">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Añadir Nuevo Cliente</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('my_profile_view') }}" class="sidebar-link">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Mi Perfil</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('change_password_view') }}" 
+                    class="sidebar-link {% if request.endpoint == 'change_password_view' %}active{% endif %}">
+                    <i class="fa-solid fa-key"></i>
+                    <span>Cambiar Contraseña</span>
+                </a>
+            </li>
+        </ul>
+        <p style="text-align: center; margin-top: 30px;"><a href="{{ url_for('logout') }}"
+                class="button secondary">Cerrar Sesión</a></p>
+    </aside>
+
+    <div class="main-content">
+        {% include 'messages.html' %}
+
+        {% if request.endpoint == 'employee_dashboard_view' %}
+        <h1>¡Bienvenido, Empleado {{ full_name }}!</h1>
+        <p>Has iniciado sesión correctamente. Esta es tu página de trabajo.</p>
+        {% endif %}
+
+        {% block dashboard_content %}
+        <div class="content-section">
+            <h2>Inventario de Productos</h2>
+            {% if products %}
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>${{ "%.2f"|format(product.price) }}</td>
+                        <td>{{ product.stock }}</td>
+                        <td>
+                            <button class="view-details-button" data-product-id="{{ product.id }}">Ver Detalles</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No hay productos disponibles en este momento.</p>
+            {% endif %}
+        </div>
+        {% endblock %}
+
+    </div>
+</div>
+
+{# ***** ESTRUCTURA DEL MODAL DE BOOTSTRAP 5 ***** #}
+<div class="modal fade" id="productDetailsModal" tabindex="-1" aria-labelledby="productDetailsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productDetailsModalLabel">Detalles del Producto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>ID:</strong> <span id="detail-id"></span></p>
+                <p><strong>Nombre:</strong> <span id="detail-name"></span></p>
+                <p><strong>Precio:</strong> <span id="detail-price"></span></p>
+                <p><strong>Stock:</strong> <span id="detail-stock"></span></p>
+                <p><strong>Descripción:</strong> <span id="detail-description"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Lógica para el toggle del sidebar (botón de hamburguesa)
+        const toggler = document.querySelector('.toggle-btn');
+        const sidebar = document.querySelector('#sidebar');
+
+        if (toggler && sidebar) {
+            toggler.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+            });
+        }
+
+        // Lógica para el modal de detalles del producto
+        const viewDetailsButtons = document.querySelectorAll('.view-details-button');
+        if (viewDetailsButtons.length > 0) {
+            const productDetailsModalElement = document.getElementById('productDetailsModal');
+
+            if (productDetailsModalElement) {
+                // Inicializa el modal de Bootstrap
+                const productDetailsModal = new bootstrap.Modal(productDetailsModalElement);
+
+                // Función auxiliar para forzar el cierre del modal y limpiar el body
+                const forceCloseModal = () => {
+                    console.log('Forzando el cierre del modal y limpieza del fondo.');
+                    // Intenta ocultar el modal con la función de Bootstrap
+                    productDetailsModal.hide();
+
+                    // Forzar la eliminación del backdrop (fondo oscuro)
+                    const backdrop = document.querySelector('.modal-backdrop');
+                    if (backdrop) {
+                        backdrop.remove();
+                    }
+
+                    // Forzar la eliminación de la clase 'modal-open' del body para restaurar el scroll
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = ''; // Limpiar cualquier estilo de overflow
+                    document.body.style.paddingRight = ''; // Limpiar padding que a veces se añade para scrollbar
+                };
+
+
+                viewDetailsButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        const productId = this.dataset.productId;
+                        fetch(`/product_details/${productId}`)
+                            .then(response => {
+                                if (!response.ok) {
+                                    return response.json().then(errorData => {
+                                        throw new Error(errorData.message || `Error HTTP: ${response.status}`);
+                                    });
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                if (data.success) {
+                                    const product = data.product;
+                                    document.getElementById('detail-id').textContent = product.id;
+                                    document.getElementById('detail-name').textContent = product.name;
+                                    document.getElementById('detail-price').textContent = `$${product.price.toFixed(2)}`;
+                                    document.getElementById('detail-stock').textContent = product.stock;
+                                    document.getElementById('detail-description').textContent = product.description || 'No hay descripción disponible.';
+                                    productDetailsModal.show(); // Muestra el modal de Bootstrap
+                                } else {
+                                    console.error('Error del servidor (success: false):', data.message);
+                                    alert('Error: ' + data.message);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error al obtener detalles del producto:', error);
+                                alert('Error de conexión o de datos: ' + error.message);
+                            });
+                    });
+                });
+
+                // ***** LÓGICA PARA CERRAR EL MODAL EXPLICITAMENTE Y FORZAR LIMPIEZA *****
+                // Selecciona el botón de cierre "x"
+                const closeButtonX = productDetailsModalElement.querySelector('.btn-close');
+                if (closeButtonX) {
+                    closeButtonX.addEventListener('click', () => {
+                        forceCloseModal(); // Llama a la función para forzar el cierre
+                    });
+                }
+
+                // Selecciona el botón "Cerrar" del footer
+                const closeButtonFooter = productDetailsModalElement.querySelector('.modal-footer .btn-secondary[data-bs-dismiss="modal"]');
+                if (closeButtonFooter) {
+                    closeButtonFooter.addEventListener('click', () => {
+                        forceCloseModal(); // Llama a la función para forzar el cierre
+                    });
+                }
+                // ***** FIN DE LA LÓGICA PARA CERRAR EL MODAL *****
+
+            }
+        }
+    });
+</script>
+{% endblock %}

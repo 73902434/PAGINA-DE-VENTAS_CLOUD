@@ -1,0 +1,640 @@
+{# templates/manage_users.html #}
+{% extends "base.html" %}
+
+{% block title %}Gestionar Usuarios{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='empleado_style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='admin_style.css') }}">
+<style>
+    /* Estilos específicos para la gestión de usuarios */
+    .user-management-container {
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+    }
+
+    .user-list-section {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+
+    .user-list-section h3 {
+        color: #333;
+        margin-bottom: 20px;
+        text-align: center;
+        font-size: 1.5em;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+    }
+
+    .user-table-container {
+        overflow-x: auto;
+    }
+
+    .user-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .user-table th,
+    .user-table td {
+        border: 1px solid #e0e0e0;
+        padding: 12px 15px;
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    .user-table th {
+        background-color: #f2f2f2;
+        color: #333;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.9em;
+    }
+
+    .user-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .user-table tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .btn-add-user {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+        display: block;
+        margin: 0 auto 20px auto;
+        text-align: center;
+        text-decoration: none;
+        width: fit-content;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-add-user:hover {
+        background-color: #0056b3;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .user-table td button {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.85em;
+        margin-right: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-edit-user {
+        background-color: #ffc107;
+        color: #333;
+    }
+
+    .btn-edit-user:hover {
+        background-color: #e0a800;
+    }
+
+    .btn-delete-user {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-delete-user:hover {
+        background-color: #c82333;
+    }
+
+    /* Estilos para el nuevo botón Activar */
+    .btn-activate-user {
+        background-color: #28a745; /* Color verde */
+        color: white;
+    }
+
+    .btn-activate-user:hover {
+        background-color: #218838; /* Verde más oscuro al pasar el ratón */
+    }
+
+
+    @media (max-width: 768px) {
+        .user-list-section {
+            padding: 15px;
+        }
+
+        .user-table th,
+        .user-table td {
+            padding: 8px 10px;
+            font-size: 0.85em;
+        }
+
+        .user-table thead {
+            display: none;
+        }
+
+        .user-table tr {
+            display: block;
+            margin-bottom: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .user-table td {
+            text-align: right;
+            padding-left: 50%;
+            position: relative;
+        }
+
+        .user-table td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 10px;
+            width: calc(50% - 20px);
+            text-align: left;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #555;
+        }
+
+        .user-table td:last-child {
+            text-align: center;
+        }
+    }
+
+    /* Estilos para el Modal: Aplicamos !important a todas las propiedades críticas */
+    .force-modal-overlay {
+        display: none !important;
+        /* Empezar oculto y forzado */
+        position: fixed !important;
+        /* Posición fija para cubrir la ventana */
+        z-index: 99999 !important;
+        /* Z-index MUY ALTO */
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        overflow: auto !important;
+        /* Permite scroll si el contenido es grande */
+        background-color: rgba(0, 0, 0, 0.7) !important;
+        /* Fondo semitransparente oscuro, forzado */
+        padding-top: 60px !important;
+    }
+
+    .force-modal-content {
+        background-color: #fefefe !important;
+        margin: 5% auto !important;
+        /* 5% desde arriba y centrado, forzado */
+        padding: 25px !important;
+        border: 1px solid #888 !important;
+        border-radius: 12px !important;
+        width: 90% !important;
+        /* Ancho ajustable, forzado */
+        max-width: 550px !important;
+        /* Máximo ancho para escritorios, forzado */
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
+        position: relative !important;
+        z-index: 100000 !important;
+        /* Z-index AÚN MÁS ALTO para el contenido, forzado */
+        animation: fadeInScale 0.3s ease-out forwards;
+        /* Animación, forzada */
+    }
+
+    /* Animación para el modal */
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .force-modal-content h2 {
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 15px;
+        font-size: 1.8em;
+    }
+
+    .force-modal-content .form-group {
+        margin-bottom: 18px;
+    }
+
+    .force-modal-content label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #34495e;
+        font-size: 0.95em;
+    }
+
+    .force-modal-content input[type="text"],
+    .force-modal-content input[type="email"],
+    .force-modal-content input[type="tel"],
+    .force-modal-content input[type="password"], /* Añadir estilo para password */
+    .force-modal-content select /* Añadir estilo para select */
+     {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 1em;
+        transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+    .force-modal-content input[type="text"]:focus,
+    .force-modal-content input[type="email"]:focus,
+    .force-modal-content input[type="tel"]:focus,
+    .force-modal-content input[type="password"]:focus, /* Añadir estilo para password */
+    .force-modal-content select:focus /* Añadir estilo para select */
+     {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        outline: none;
+    }
+
+    .force-modal-content input[readonly] {
+        background-color: #e9ecef !important;
+        cursor: not-allowed !important;
+        opacity: 0.8;
+    }
+
+    .force-modal-content button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        margin-right: 15px;
+        font-weight: bold;
+    }
+
+    .force-modal-content button:active {
+        transform: translateY(1px);
+    }
+
+    .force-modal-content .btn-register-submit {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .force-modal-content .btn-register-submit:hover {
+        background-color: #218838;
+    }
+
+    .force-modal-content .btn-delete-modal-action {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .force-modal-content .btn-delete-modal-action:hover {
+        background-color: #c82333;
+    }
+
+    .force-modal-content .btn-back-to-list {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .force-modal-content .btn-back-to-list:hover {
+        background-color: #5a6268;
+    }
+
+    .force-close-button {
+        color: #888;
+        float: right;
+        font-size: 32px;
+        font-weight: bold;
+        line-height: 1;
+        margin-top: -10px;
+    }
+
+    .force-close-button:hover,
+    .force-close-button:focus {
+        color: #333;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+        .force-modal-content {
+            width: 95% !important;
+            margin: 10% auto !important;
+            padding: 15px !important;
+        }
+
+        .force-modal-content h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .force-modal-content button {
+            display: block;
+            width: 100%;
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h2>Menú Administrador</h2>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin_dashboard_view') }}" class="sidebar-link">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <span>Dashboard Principal</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('manage_products_view') }}" class="sidebar-link">
+                    <i class="fa-solid fa-boxes"></i>
+                    <span>Gestionar Productos</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('manage_users_view') }}" class="sidebar-link active">
+                    <i class="fa-solid fa-users-cog"></i>
+                    <span>Gestionar Usuarios</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin_boletas_reports_view') }}"
+                    class="sidebar-link {% if request.endpoint == 'admin_boletas_reports_view' %}active{% endif %}">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    <span>Reportes y Boletas</span>
+                </a>
+            </li>
+            
+        </ul>
+        <p style="text-align: center; margin-top: 30px;"><a href="{{ url_for('logout') }}"
+                class="button secondary">Cerrar Sesión</a></p>
+    </aside>
+    <div class="main-content">
+        <main class="content px-3 py-4">
+            <div class="container-fluid user-management-container">
+                {% include 'messages.html' %} {# Para mostrar mensajes flash #}
+
+                <div class="user-list-section">
+                    <h3>Lista de Usuarios</h3>
+                    {# Botón para nuevo registro de usuario, apunta a 'register_user_view' #}
+                    <a href="{{ url_for('register_user_view') }}" class="btn-add-user">
+                        <i class="fa-solid fa-user-plus"></i> Nuevo Registro de Usuario
+                    </a>
+
+                    {% if users %}
+                    <div class="user-table-container">
+                        <table class="user-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Usuario</th>
+                                    <th>Nombre</th>
+                                    <th>Apellido</th>
+                                    <th>Email</th>
+                                    <th>Teléfono</th>
+                                    <th>Dirección</th>
+                                    <th>DNI</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                    <th>Contraseña</th> {# NUEVA COLUMNA DE CONTRASEÑA #}
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td data-label="ID">{{ user.id }}</td>
+                                    <td data-label="Usuario">{{ user.username }}</td>
+                                    <td data-label="Nombre">{{ user.first_name }}</td>
+                                    <td data-label="Apellido">{{ user.last_name }}</td>
+                                    <td data-label="Email">{{ user.email }}</td>
+                                    <td data-label="Teléfono">{{ user.phone if user.phone else 'N/A' }}</td>
+                                    <td data-label="Dirección">{{ user.address if user.address else 'N/A' }}</td>
+                                    <td data-label="DNI">{{ user.dni if user.dni else 'N/A' }}</td>
+                                    <td data-label="Rol">{{ user.role }}</td>
+                                    <td data-label="Estado">
+                                        {% if user.is_active %}
+                                        <span style="color: green; font-weight: bold;">Activo</span>
+                                        {% else %}
+                                        <span style="color: red; font-weight: bold;">Inactivo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td data-label="Contraseña">********</td> {# Mostrar siempre **** #}
+                                    <td data-label="Acciones">
+                                        <button class="btn-edit-user" data-id="{{ user.id }}">Editar</button>
+                                        {% if user.is_active %}
+                                        <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST"
+                                            style="display:inline;">
+                                            <button type="submit" class="btn btn-danger btn-delete-user"
+                                                onclick="return confirm('¿Estás seguro de que quieres eliminar a este usuario? Si tiene ventas vinculadas, se marcará como inactivo.');">Eliminar</button>
+                                        </form>
+                                        {% else %}
+                                        {# Botón para activar un usuario inactivo #}
+                                        <form action="{{ url_for('activate_user', user_id=user.id) }}" method="POST"
+                                            style="display:inline;">
+                                            <button type="submit"
+                                                class="btn btn-success btn-activate-user">Activar</button>
+                                        </form>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p style="text-align: center;">No hay usuarios registrados en la base de datos.</p>
+                    {% endif %}
+                </div>
+
+            </div> {# Cierra el container-fluid #}
+        </main>
+    </div> {# Cierra el main-content #}
+</div> {# Cierra el dashboard-layout #}
+
+{# Modal de Edición de Usuario - Con CLASES RADICALES #}
+<div id="editUserModal" class="force-modal-overlay">
+    <div class="force-modal-content">
+        <span class="force-close-button" onclick="closeModal('editUserModal')">&times;</span>
+        <h2>Editar Usuario</h2>
+        <form id="editUserForm" method="POST">
+            <div class="form-group">
+                <label for="edit_username">Nombre de Usuario:</label>
+                {# QUITA 'readonly' de aquí para que sea editable #}
+                <input type="text" id="edit_username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="edit_first_name">Nombre:</label>
+                {# QUITA 'readonly' de aquí para que sea editable #}
+                <input type="text" id="edit_first_name" name="first_name" required>
+            </div>
+            <div class="form-group">
+                <label for="edit_last_name">Apellido:</label>
+                {# QUITA 'readonly' de aquí para que sea editable #}
+                <input type="text" id="edit_last_name" name="last_name" required>
+            </div>
+            <div class="form-group">
+                <label for="edit_email">Email:</label>
+                <input type="email" id="edit_email" name="email" required>
+            </div>
+            {# CAMPO NUEVO: Contraseña #}
+            <div class="form-group">
+                <label for="edit_password">Nueva Contraseña (Dejar vacío para no cambiar):</label>
+                <input type="password" id="edit_password" name="password" autocomplete="new-password">
+            </div>
+            {# FIN CAMPO NUEVO #}
+            <div class="form-group">
+                <label for="edit_phone">Teléfono:</label>
+                <input type="tel" id="edit_phone" name="phone">
+            </div>
+            <div class="form-group">
+                <label for="edit_address">Dirección:</label>
+                <input type="text" id="edit_address" name="address">
+            </div>
+            <div class="form-group">
+                <label for="edit_dni">DNI:</label>
+                <input type="text" id="edit_dni" name="dni">
+            </div>
+            {# CAMPO NUEVO: Rol (asegúrate de que exista en tu DB y que edit_user en app.py lo maneje) #}
+            <div class="form-group">
+                <label for="edit_role">Rol:</label>
+                <select id="edit_role" name="role" required>
+                    <option value="admin">Administrador</option>
+                    <option value="employee">Empleado</option>
+                </select>
+            </div>
+            {# FIN CAMPO NUEVO #}
+            <button type="submit" class="btn-register-submit">Guardar Cambios</button>
+            <button type="button" class="btn-back-to-list" onclick="closeModal('editUserModal')">Cancelar</button>
+        </form>
+    </div>
+</div>
+
+{# Modal de Confirmación de Eliminación - Con CLASES RADICALES #}
+<div id="deleteConfirmModal" class="force-modal-overlay">
+    <div class="force-modal-content">
+        <span class="force-close-button" onclick="closeModal('deleteConfirmModal')">&times;</span>
+        <h2>Confirmar Eliminación</h2>
+        <p>¿Estás seguro de que quieres eliminar a <strong id="deleteUsername"></strong>?</p>
+        <form id="deleteUserForm" method="POST">
+            <input type="hidden" id="deleteUserId" name="user_id">
+            <button type="submit" class="btn-delete-modal-action">Eliminar</button>
+            <button type="button" class="btn-back-to-list" onclick="closeModal('deleteConfirmModal')">Cancelar</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %} {# Cierre ÚNICO del bloque content #}
+
+
+{% block scripts %}
+{{ super() }}
+<script>
+    // Función para abrir un modal específico
+    function openModal(modalId) {
+        const modalElement = document.getElementById(modalId);
+        if (modalElement) {
+            modalElement.style.setProperty('display', 'block', 'important');
+            modalElement.style.setProperty('z-index', '99999', 'important');
+            modalElement.querySelector('.force-modal-content').style.setProperty('z-index', '100000', 'important');
+        }
+    }
+
+    // Función para cerrar un modal específico
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Cerrar el modal al hacer clic fuera de él
+    window.onclick = function (event) {
+        const editModal = document.getElementById('editUserModal');
+        const deleteModal = document.getElementById('deleteConfirmModal');
+        if (event.target == editModal) {
+            editModal.style.display = 'none';
+        }
+        if (event.target == deleteModal) {
+            deleteModal.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Manejo del botón de EDITAR
+        document.querySelectorAll('.btn-edit-user').forEach(button => {
+            button.addEventListener('click', function () {
+                const userId = this.dataset.id; // Obtener el ID del usuario
+
+                // Realizar una petición AJAX para obtener los datos del usuario
+                fetch(`/get_user_data/${userId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            // Si la respuesta no es OK (ej. 404, 500), lanzar un error
+                            return response.json().then(err => { throw new Error(err.message || 'Error al obtener datos'); });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Rellenar el formulario del modal de edición
+                        document.getElementById('editUserForm').action = `/edit_user/${data.id}`; // Define la acción del formulario
+                        document.getElementById('edit_username').value = data.username;
+                        document.getElementById('edit_first_name').value = data.first_name;
+                        document.getElementById('edit_last_name').value = data.last_name;
+                        document.getElementById('edit_email').value = data.email;
+                        document.getElementById('edit_phone').value = data.phone || '';
+                        document.getElementById('edit_address').value = data.address || '';
+                        document.getElementById('edit_dni').value = data.dni || '';
+                        document.getElementById('edit_role').value = data.role; // Cargar el rol en el select
+
+                        // IMPORTANTE: Dejar el campo de contraseña vacío para que el administrador decida si cambiarla.
+                        document.getElementById('edit_password').value = '';
+
+                        openModal('editUserModal'); // Abre el modal de edición
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener datos del usuario:', error);
+                        alert('Error al cargar los datos del usuario: ' + error.message);
+                    });
+            });
+        });
+
+        // Manejo del botón de ELIMINAR
+        document.querySelectorAll('.btn-delete-user').forEach(button => {
+            button.addEventListener('click', function () {
+                const userId = this.dataset.id;
+                // Obtener el nombre de usuario de la misma fila para mostrarlo en el modal
+                const row = this.closest('tr');
+                const username = row.querySelector('[data-label="Usuario"]').textContent;
+
+                document.getElementById('deleteUsername').textContent = username;
+                document.getElementById('deleteUserId').value = userId; // Pasa el ID al input hidden
+                document.getElementById('deleteUserForm').action = `/delete_user/${userId}`; // Define la acción del formulario
+
+                openModal('deleteConfirmModal'); // Abre el modal de confirmación
+            });
+        });
+    });
+</script>
+{% endblock %}
