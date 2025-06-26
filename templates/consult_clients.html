@@ -5,12 +5,32 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='empleado_style.css') }}">
+<style>
+    /* ***** CSS AGREGADO AQUÍ PARA EL LOGO DIRECTAMENTE EN EL HTML ***** */
+    .sidebar-logo {
+        max-width: 80%;
+        /* Ajusta este valor si es necesario para tu logo */
+        height: auto;
+        /* Mantiene la proporción de la imagen */
+        display: block;
+        /* Para centrarlo con margin auto */
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 10px;
+        /* Espacio debajo del logo */
+        object-fit: contain;
+        /* Asegura que la imagen se ajuste sin recortarse */
+    }
+
+    /* ***** FIN DEL CSS DEL LOGO ***** */
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-layout"> {# Usa la clase "dashboard-layout" para coincidir con tu CSS #}
     <aside class="sidebar"> {# Usa la clase "sidebar" para coincidir con tu CSS #}
-        <div class="sidebar-logo"> {# ¡REINSTALADO! Aquí va el título de la barra lateral. #}
+        <div class="sidebar-header">
+            <img src="{{ url_for('static', filename='img/logo_v2.png') }}" alt="Logo VentasPlus" class="sidebar-logo">
             <h2>Menú Empleado</h2>
         </div>
         <ul class="sidebar-nav">

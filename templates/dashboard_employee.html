@@ -29,6 +29,24 @@
         padding-right: 0px !important;
         /* Evita saltos si el scrollbar desaparece */
     }
+
+    /* ***** CSS AGREGADO AQUÍ PARA EL LOGO DIRECTAMENTE EN EL HTML ***** */
+    .sidebar-logo {
+        max-width: 80%;
+        /* Ajusta este valor si es necesario para tu logo */
+        height: auto;
+        /* Mantiene la proporción de la imagen */
+        display: block;
+        /* Para centrarlo con margin auto */
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 10px;
+        /* Espacio debajo del logo */
+        object-fit: contain;
+        /* Asegura que la imagen se ajuste sin recortarse */
+    }
+
+    /* ***** FIN DEL CSS DEL LOGO ***** */
 </style>
 {# ***** FIN DE CORRECCIÓN CSS ***** #}
 
@@ -37,7 +55,10 @@
 {% block content %}
 <div class="dashboard-layout">
     <aside class="sidebar">
-        <h2>Menú Empleado</h2>
+        <div class="sidebar-header">
+            <img src="{{ url_for('static', filename='img/logo_v2.png') }}" alt="Logo VentasPlus" class="sidebar-logo">
+            <h2>Menú Empleado</h2>
+        </div>
         <ul>
             <li class="sidebar-item">
                 <a href="{{ url_for('employee_dashboard_view') }}"
@@ -81,7 +102,7 @@
                 </a>
             </li>
             <li class="sidebar-item">
-                <a href="{{ url_for('change_password_view') }}" 
+                <a href="{{ url_for('change_password_view') }}"
                     class="sidebar-link {% if request.endpoint == 'change_password_view' %}active{% endif %}">
                     <i class="fa-solid fa-key"></i>
                     <span>Cambiar Contraseña</span>

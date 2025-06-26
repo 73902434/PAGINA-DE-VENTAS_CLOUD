@@ -119,12 +119,14 @@
 
     /* Estilos para el nuevo botón Activar */
     .btn-activate-user {
-        background-color: #28a745; /* Color verde */
+        background-color: #28a745;
+        /* Color verde */
         color: white;
     }
 
     .btn-activate-user:hover {
-        background-color: #218838; /* Verde más oscuro al pasar el ratón */
+        background-color: #218838;
+        /* Verde más oscuro al pasar el ratón */
     }
 
 
@@ -247,9 +249,12 @@
     .force-modal-content input[type="text"],
     .force-modal-content input[type="email"],
     .force-modal-content input[type="tel"],
-    .force-modal-content input[type="password"], /* Añadir estilo para password */
-    .force-modal-content select /* Añadir estilo para select */
-     {
+    .force-modal-content input[type="password"],
+    /* Añadir estilo para password */
+    .force-modal-content select
+
+    /* Añadir estilo para select */
+        {
         width: 100%;
         padding: 12px;
         border: 1px solid #ccc;
@@ -262,9 +267,12 @@
     .force-modal-content input[type="text"]:focus,
     .force-modal-content input[type="email"]:focus,
     .force-modal-content input[type="tel"]:focus,
-    .force-modal-content input[type="password"]:focus, /* Añadir estilo para password */
-    .force-modal-content select:focus /* Añadir estilo para select */
-     {
+    .force-modal-content input[type="password"]:focus,
+    /* Añadir estilo para password */
+    .force-modal-content select:focus
+
+    /* Añadir estilo para select */
+        {
         border-color: #007bff;
         box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
         outline: none;
@@ -353,12 +361,37 @@
             margin-bottom: 10px;
         }
     }
+
+    /* Estilos específicos para el logo en el sidebar del dashboard */
+    .sidebar-logo-container {
+        padding: 10px 0;
+        /* Espaciado interno para el logo */
+        text-align: center;
+        /* Centrar la imagen dentro del contenedor */
+        margin-bottom: 20px;
+        /* Espacio entre el logo y el título "Menú Administrador" */
+    }
+
+    .sidebar-logo-container img {
+
+        max-width: 80%;
+        /* Ajusta el tamaño máximo de la imagen al 80% del contenedor */
+        height: auto;
+        /* Mantiene la proporción de la imagen */
+        display: block;
+        /* Asegura que 'margin: auto' funcione para centrar la imagen */
+        margin: 0 auto;
+        /* Centrar la imagen horizontalmente */
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-layout">
     <aside class="sidebar">
+        <div class="sidebar-logo-container">
+            <img src="{{ url_for('static', filename='img/logo_v2.png') }}" alt="Logo de VentasPlus S.A.C.">
+        </div>
         <div class="sidebar-logo">
             <h2>Menú Administrador</h2>
         </div>
@@ -388,7 +421,7 @@
                     <span>Reportes y Boletas</span>
                 </a>
             </li>
-            
+
         </ul>
         <p style="text-align: center; margin-top: 30px;"><a href="{{ url_for('logout') }}"
                 class="button secondary">Cerrar Sesión</a></p>

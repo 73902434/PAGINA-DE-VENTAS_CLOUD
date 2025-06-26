@@ -6,11 +6,32 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='empleado_style.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='admin_style.css') }}">
+<style>
+    /* Estilos específicos para el logo en el sidebar del dashboard */
+    .sidebar-logo-container {
+        padding: 10px 0; /* Espaciado interno para el logo */
+        text-align: center; /* Centrar la imagen dentro del contenedor */
+        margin-bottom: 20px; /* Espacio entre el logo y el título "Menú Administrador" */
+    }
+
+    .sidebar-logo-container img {
+        
+        max-width: 80%; /* Ajusta el tamaño máximo de la imagen al 80% del contenedor */
+        height: auto; /* Mantiene la proporción de la imagen */
+        display: block; /* Asegura que 'margin: auto' funcione para centrar la imagen */
+        margin: 0 auto; /* Centrar la imagen horizontalmente */
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-layout">
     <aside class="sidebar">
+        
+        <div class="sidebar-logo-container">
+            <img src="{{ url_for('static', filename='img/logo_v2.png') }}" alt="Logo de VentasPlus S.A.C.">
+        </div>
+
         <div class="sidebar-logo">
             <h2>Menú Administrador</h2>
         </div>
