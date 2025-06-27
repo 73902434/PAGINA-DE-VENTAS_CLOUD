@@ -14,14 +14,14 @@
     /* Contenedor principal de la sección */
     .abr-container {
         padding: 20px;
-        background-color: #f8f9fa;
+        background-color: #ffffff; /* Fondo BLANCO PURO para el área principal de reportes */
         border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Sombra suave para dar profundidad */
     }
 
     /* Título de la página */
     .abr-heading {
-        color: #007bff;
+        color: #007bff; /* Color azul para el título "Reportes y Boletas" */
         margin-bottom: 25px;
         font-weight: 600;
         text-align: center;
@@ -29,26 +29,22 @@
 
     /* Sección de filtro */
     .abr-filter-section {
-        background-color: #ffffff;
-        border: 1px solid #e0e0e0;
+        background-color: #e9ecef; /* ¡NUEVO COLOR: Gris claro más VISIBLE para el contenedor de filtros! */
+        border: 1px solid #d4d4d4; /* Borde más definido para el contenedor de filtros */
         border-radius: 8px;
         padding: 20px;
         margin-bottom: 30px;
         box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
         display: flex;
-        /* Para alinear elementos */
         align-items: center;
         gap: 15px;
-        /* Espacio entre elementos */
         flex-wrap: wrap;
-        /* Para que los elementos se ajusten en pantallas pequeñas */
     }
 
     .abr-filter-section label {
         font-weight: 500;
         color: #343a40;
         margin-bottom: 0;
-        /* Eliminar margen inferior del label */
     }
 
     .abr-filter-section select {
@@ -57,7 +53,7 @@
         border-radius: 5px;
         font-size: 1em;
         min-width: 200px;
-        /* Ancho mínimo para el select */
+        background-color: #ffffff; /* Fondo blanco para el select */
     }
 
     .abr-filter-section .abr-btn-apply-filter {
@@ -78,8 +74,7 @@
     /* Contenedor de la tabla de reportes */
     .abr-report-table-container {
         overflow-x: auto;
-        /* Permite scroll horizontal en tablas grandes */
-        background-color: #ffffff;
+        background-color: #e9ecef; /* ¡NUEVO COLOR: Gris claro más VISIBLE para el contenedor de la tabla! */
         border-radius: 8px;
         box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
     }
@@ -89,38 +84,35 @@
         width: 100%;
         border-collapse: collapse;
         margin-bottom: 0;
-        /* Eliminar margen inferior si lo añade */
     }
 
     .abr-report-table th,
     .abr-report-table td {
         padding: 12px 15px;
         text-align: left;
-        border-bottom: 1px solid #dee2e6;
+        border-bottom: 1px solid #d4d4d4; /* Bordes de tabla más definidos */
         vertical-align: middle;
     }
 
     .abr-report-table thead th {
-        background-color: #007bff;
+        background-color: #007bff; /* Fondo azul para el encabezado de la tabla */
         color: white;
         font-weight: 600;
         white-space: nowrap;
-        /* Evita que el texto del encabezado se rompa */
     }
 
     .abr-report-table tbody tr:nth-child(even) {
-        background-color: #f2f2f2;
+        background-color: #f2f2f2; /* Filas pares de la tabla con un gris claro */
     }
 
     .abr-report-table tbody tr:hover {
-        background-color: #e9ecef;
+        background-color: #dcdcdc; /* Efecto hover para filas de tabla, ligeramente más oscuro */
     }
 
     /* Estilos para las etiquetas de datos en móvil */
     .abr-report-table td[data-label] {
         position: relative;
         padding-left: 100px;
-        /* Espacio para la etiqueta */
     }
 
     .abr-report-table td[data-label]::before {
@@ -128,7 +120,6 @@
         position: absolute;
         left: 15px;
         width: 80px;
-        /* Ancho fijo para la etiqueta */
         font-weight: bold;
         color: #555;
         text-align: left;
@@ -136,21 +127,18 @@
 
     /* Estilos de estado */
     .abr-status-cancelled {
-        color: #dc3545;
-        /* Rojo para anulada */
+        color: #dc3545; /* Rojo para anulada */
         font-weight: bold;
     }
 
     .abr-status-active {
-        color: #28a745;
-        /* Verde para activa */
+        color: #28a745; /* Verde para activa */
         font-weight: bold;
     }
 
     /* Botones de acción en la tabla */
     .abr-btn-cancel-sale {
-        background-color: #ffc107;
-        /* Amarillo para anular */
+        background-color: #ffc107; /* Amarillo para anular */
         color: #343a40;
         border: none;
         padding: 6px 12px;
@@ -158,7 +146,6 @@
         cursor: pointer;
         transition: background-color 0.2s ease;
         white-space: nowrap;
-        /* Evita que el botón se rompa */
     }
 
     .abr-btn-cancel-sale:hover {
@@ -168,8 +155,7 @@
     .abr-btn-cancel-sale[disabled] {
         opacity: 0.6;
         cursor: not-allowed;
-        background-color: #6c757d;
-        /* Gris para deshabilitado */
+        background-color: #6c757d; /* Gris para deshabilitado */
         color: white;
     }
 
@@ -188,7 +174,6 @@
     /* Estilos del Modal (se mantienen con prefijos para consistencia) */
     .abr-modal-overlay {
         display: none;
-        /* Oculto por defecto */
         position: fixed;
         top: 0;
         left: 0;
@@ -201,7 +186,7 @@
     }
 
     .abr-modal-content {
-        background-color: #fff;
+        background-color: #e9ecef; /* Fondo del modal también en el color visible */
         padding: 30px;
         border-radius: 10px;
         width: 90%;
@@ -242,8 +227,7 @@
     }
 
     .abr-btn-confirm-action {
-        background-color: #dc3545;
-        /* Rojo para confirmar anulación */
+        background-color: #dc3545; /* Rojo para confirmar anulación */
         color: white;
         border: none;
         padding: 10px 20px;
@@ -272,8 +256,7 @@
 
     /* --- ¡¡¡AÑADE ESTOS ESTILOS PARA EL BOTÓN "VER BOLETA"!!! --- */
     .abr-btn-view-invoice {
-        background-color: #007bff;
-        /* Un color azul, similar a otros botones principales */
+        background-color: #007bff; /* Un color azul, similar a otros botones principales */
         color: white;
         border: none;
         padding: 6px 12px;
@@ -281,11 +264,8 @@
         cursor: pointer;
         transition: background-color 0.2s ease;
         text-decoration: none;
-        /* Quitar subrayado del enlace */
         display: inline-block;
-        /* Para que padding y margin funcionen bien */
         margin-left: 8px;
-        /* Espacio entre el botón de anular y ver */
         white-space: nowrap;
     }
 
@@ -293,7 +273,6 @@
     @media (max-width: 768px) {
         .abr-report-table thead {
             display: none;
-            /* Oculta los encabezados de tabla en móvil */
         }
 
         .abr-report-table,
@@ -301,9 +280,7 @@
         .abr-report-table tr,
         .abr-report-table td {
             display: block;
-            /* Hace que las filas y celdas se comporten como bloques */
             width: 100%;
-            /* Las celdas y filas ocupan todo el ancho */
         }
 
         .abr-report-table tr {
@@ -316,9 +293,7 @@
 
         .abr-report-table td {
             border: none;
-            /* Elimina los bordes internos de las celdas */
             border-bottom: 1px solid #eee;
-            /* Añade un borde entre las "filas" de las celdas */
         }
 
         .abr-report-table td:last-child {
@@ -327,45 +302,32 @@
 
         .abr-report-table td[data-label]::before {
             text-align: right;
-            /* Alinea la etiqueta a la derecha */
             padding-right: 10px;
-            /* Espacio entre etiqueta y valor */
         }
 
         .abr-filter-section {
             flex-direction: column;
-            /* Apila los elementos de filtro */
             align-items: stretch;
-            /* Estira los elementos para ocupar el ancho */
         }
 
         .abr-filter-section select,
         .abr-filter-section .abr-btn-apply-filter {
             width: 100%;
-            /* Ancho completo para select y botón en móvil */
         }
     }
 
     /* Estilos específicos para el logo en el sidebar del dashboard */
     .sidebar-logo-container {
         padding: 10px 0;
-        /* Espaciado interno para el logo */
         text-align: center;
-        /* Centrar la imagen dentro del contenedor */
         margin-bottom: 20px;
-        /* Espacio entre el logo y el título "Menú Administrador" */
     }
 
     .sidebar-logo-container img {
-
         max-width: 80%;
-        /* Ajusta el tamaño máximo de la imagen al 80% del contenedor */
         height: auto;
-        /* Mantiene la proporción de la imagen */
         display: block;
-        /* Asegura que 'margin: auto' funcione para centrar la imagen */
         margin: 0 auto;
-        /* Centrar la imagen horizontalmente */
     }
 </style>
 {% endblock %}

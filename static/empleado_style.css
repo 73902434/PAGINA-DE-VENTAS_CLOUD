@@ -3,6 +3,7 @@
 /* Agrega estas líneas al principio del archivo para un mejor manejo del box model */
 html {
     box-sizing: border-box;
+    font-size: 16px; /* Define un tamaño de fuente base para consistencia de rem */
 }
 
 *,
@@ -10,6 +11,15 @@ html {
 *::after {
     box-sizing: inherit;
 }
+
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Fuente más moderna y legible */
+    line-height: 1.6;
+    color: #343a40; /* Color de texto base para todo el body */
+    margin: 0;
+    background-color: #f4f7f6; /* Un gris muy suave para el fondo general del cuerpo */
+}
+
 
 /* --- REGLAS DE LAYOUT (MOVIMIENTO DE DASHBOARD_EMPLOYEE.HTML AQUI) --- */
 /* Estilos generales para el layout del dashboard */
@@ -20,6 +30,7 @@ html {
     /* Ocupa el 100% del viewport height para que el modal funcione correctamente */
     width: 100%;
     /* Ocupa el 100% del ancho dentro de main */
+    overflow: hidden; /* Evita scroll en el layout principal si los hijos ya lo manejan */
 }
 
 
@@ -44,7 +55,32 @@ html {
     /* Permite scroll vertical si el contenido de la sidebar es largo */
     padding-top: 0;
     /* Ajuste de padding */
+    /* ELIMINADAS PROPIEDADES FLEXBOX AQUI PARA MANTENER EL BOTÓN EN SU LUGAR ORIGINAL */
 }
+
+/* Estilos para el logo en el sidebar */
+.sidebar-logo-container {
+    padding: 20px 0 10px; /* Más padding arriba, menos abajo del logo */
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Separador sutil */
+}
+
+.sidebar-logo-container img {
+    max-width: 80%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.sidebar h2 {
+    color: white;
+    margin-top: 20px; 
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    text-align: center;
+}
+
 
 .main-content {
     flex-grow: 1;
@@ -57,16 +93,18 @@ html {
     padding-top: 0 !important;
     margin-bottom: 20px;
     /* Añade un pequeño margen inferior para el contenido principal */
+    background-color: #f4f7f6; /* Fondo ligero para la zona de contenido principal */
 }
 
 /* --- FIN REGLAS DE LAYOUT --- */
 
 
 /* --- Estilos Generales de Títulos de Contenido (Ahora TODOS serán azules) --- */
-/* Aplica a los H1 (ej: ¡Bienvenido!) y H2 (ej: Inventario de Productos, Crear Nueva Venta, Consultar Ventas)
-   dentro del área de contenido principal (.main-content). */
+/* Aplica a los H1 (ej: ¡Bienvenido!), H2 (ej: Inventario de Productos, Crear Nueva Venta, Consultar Ventas)
+   y H3 dentro del área de contenido principal (.main-content). */
 .main-content h1,
-.main-content h2 {
+.main-content h2,
+.main-content h3 { 
     color: #007bff;
     /* Color azul de Bootstrap para todos los títulos de contenido */
     font-weight: 700;
@@ -75,193 +113,491 @@ html {
     /* Espacio debajo de los títulos */
 }
 
-
-/* Estilos para el menú lateral (sidebar) - PROPIEDADES VISUALES */
-/* El color del título 'Menú Empleado' */
-.sidebar h2 {
-    color: white;
-    /* Color blanco para el título del menú lateral, como en tus imágenes */
-    margin-bottom: 20px;
-    font-size: 1.5em;
-    text-align: center;
-}
-
-/* Estilos de los enlaces del menú lateral */
+/* Estilos para los enlaces del menú lateral */
 .sidebar ul {
     list-style: none;
     padding: 0;
+    /* ELIMINADO flex-grow: 1; AQUI */
 }
 
 .sidebar ul li {
-    margin-bottom: 10px;
+    margin-bottom: 8px; /* Reducido ligeramente para más cohesión */
 }
 
 .sidebar ul li a {
     color: white;
-    /* Color del enlace normal (blanco) */
     text-decoration: none;
-    padding: 10px 15px;
+    padding: 12px 15px; /* Más padding para hacer los enlaces más clickables */
     display: block;
     border-radius: 5px;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-size: 1.05em; /* Un poco más grande */
 }
 
 .sidebar ul li a:hover,
 .sidebar ul li a.active {
     background-color: #007bff;
-    /* Color de realce (azul) al pasar el mouse o cuando está activo */
     color: white;
-    /* Asegura el texto blanco en hover/active */
+    transform: translateX(5px); /* Pequeña animación al pasar el mouse */
 }
 
 /* Estilo para el botón "Cerrar Sesión" (usando la clase 'logout-button' del HTML) */
 .sidebar .logout-button {
     background-color: #dc3545;
-    /* Rojo de Bootstrap */
     border-color: #dc3545;
-    /* Asegura borde rojo */
     color: white;
     width: 100%;
-    margin-top: 20px;
+    margin-top: 20px; /* Margen superior para separarlo del menú. YA NO HAY margin-top: auto; */
     padding: 10px;
     text-align: center;
     border-radius: 5px;
     display: block;
     text-decoration: none;
     transition: background-color 0.3s ease;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra para que destaque */
 }
 
 .sidebar .logout-button:hover {
     background-color: #c82333;
-    /* Rojo más oscuro al pasar el mouse */
     border-color: #c82333;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 
 /* Estilos para las secciones de contenido (como 'Inventario de Productos' dentro de dashboard_employee.html) */
 .content-section {
-    background-color: #f8f9fa;
-    padding: 20px;
+    background-color: #cee1e2; /* Un azul muy claro para el fondo de las secciones */
+    padding: 25px; /* Más padding para mejor espaciado */
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    margin-bottom: 20px;
-    /* Asegura espacio entre secciones */
-    color: #343a40; /* <-- AGREGADO/MODIFICADO: Color de texto oscuro para el contenido de la sección */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); /* Sombra ligeramente más pronunciada */
+    margin-bottom: 25px; /* Más espacio entre secciones */
+    color: #343a40; /* Color de texto oscuro para el contenido de la sección */
 }
+
+/* Estilos para los formularios */
+.form-group {
+    margin-bottom: 1rem; /* Espaciado estándar */
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600; /* Ligeramente más negrita */
+    color: #495057; /* Un gris oscuro para las etiquetas */
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group textarea,
+.form-group select { /* AGREGADO SELECT para consistencia */
+    width: 100%;
+    padding: 0.75rem 1rem; /* Más padding interno */
+    border: 1px solid #ced4da; /* Borde gris claro */
+    border-radius: 0.375rem; /* Bordes ligeramente más redondeados */
+    box-sizing: border-box;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057; /* Color de texto para los inputs */
+    background-color: #fff;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Sombra de enfoque azul */
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 90px; /* Ligeramente más alto */
+}
+
+/* Estilos para botones de formulario (Añadir/Guardar) */
+.btn-submit {
+    background-color: #28a745;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: auto; /* Permitir que el botón se ajuste a su contenido o a un ancho definido por su contenedor */
+    display: inline-block; /* Para que funcione margin-right/left si hay varios */
+}
+
+.btn-submit:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+}
+
 
 /* Estilos para la tabla de productos (incluyendo la del dashboard y crear venta) */
 .product-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 15px;
+    margin-top: 20px; /* Más espacio */
+    background-color: #ffffff; /* Fondo blanco para la tabla */
+    border-radius: 8px; /* Bordes redondeados para la tabla */
+    overflow: hidden; /* Asegura que los bordes redondeados se apliquen bien */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Sombra sutil */
 }
 
 .product-table th,
 .product-table td {
-    border: 1px solid #dee2e6;
-    padding: 10px;
+    border: 1px solid #e9ecef; /* Bordes más claros */
+    padding: 12px 15px; /* Más padding */
     text-align: left;
-    color: #343a40; /* <-- AGREGADO: Asegura color de texto oscuro para celdas de tabla */
+    color: #343a40; /* Color de texto oscuro para celdas de tabla */
 }
 
 .product-table th {
-    background-color: #e9ecef;
+    background-color: #e9ecef; /* Fondo gris claro para los encabezados */
     font-weight: bold;
+    text-transform: uppercase; /* MAYUSCULAS para los encabezados */
+    font-size: 0.9em;
+    color: #495057; /* Color de texto para los encabezados */
 }
 
 .product-table tbody tr:nth-child(even) {
-    background-color: #f2f2f2;
+    background-color: #f8f9fa; /* Franjas más claras */
 }
 
-.product-table button {
-    padding: 5px 10px;
-    background-color: #007bff;
-    color: white;
+.product-table tbody tr:hover {
+    background-color: #e2e6ea; /* Resaltado al pasar el mouse */
+}
+
+/* Botones dentro de la tabla */
+.product-table .btn-action { /* Clase general para botones de acción en tabla */
+    padding: 6px 12px; /* Ajuste para botones de tabla */
+    font-size: 0.9em; /* Más pequeños */
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, box-shadow 0.2s ease;
+    color: white; /* Asegura texto blanco */
 }
 
-.product-table button:hover {
+.product-table .btn-action:hover {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.product-table .btn-edit {
+    background-color: #007bff;
+}
+
+.product-table .btn-edit:hover {
     background-color: #0056b3;
 }
 
-/* Estilos para la tabla del carrito (en Crear Nueva Venta) */
+.product-table .btn-delete {
+    background-color: #dc3545;
+    margin-left: 5px; /* Pequeño espacio entre botones */
+}
+
+.product-table .btn-delete:hover {
+    background-color: #c82333;
+}
+
+
+/* Estilos para la tabla del carrito (en Crear Nueva Venta) - Mantiene consistencia con product-table */
 .cart-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 15px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .cart-table th,
 .cart-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
+    border: 1px solid #dee2e6;
+    padding: 10px;
     text-align: left;
-    color: #343a40; /* <-- AGREGADO: Asegura color de texto oscuro para celdas de carrito */
+    color: #343a40;
 }
 
 .cart-table th {
-    background-color: #f2f2f2;
+    background-color: #e9ecef;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #495057;
 }
 
 .cart-table tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
+    background-color: #f8f9fa;
+}
+
+.cart-table tbody tr:hover {
+    background-color: #e2e6ea;
 }
 
 .cart-table button.remove-from-cart {
     background-color: #dc3545;
     color: white;
     border: none;
-    padding: 5px 10px;
+    padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.8em;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
 }
 
 .cart-table button.remove-from-cart:hover {
     background-color: #c82333;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-/* Estilos para el Modal de Detalles del Producto */
+
+/* Estilos para el Modal de Detalles del Producto (siempre y cuando no haya conflicto con admin_style) */
+/* Nota: Las clases .modal.show y animaciones deberían ser consistentes con admin_style.css o Bootstrap */
 .modal {
-    /* Estas reglas están siendo sobrescritas por Bootstrap, no son las que controlan el comportamiento. */
-    /* Las reglas de Bootstrap en base.html y los scripts son los que manejan show/hide, visibility y opacity */
+    display: flex;
+    visibility: hidden;
+    opacity: 0;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal.show {
+    visibility: visible;
+    opacity: 1;
 }
 
 .modal-content {
     background-color: #fefefe;
-    padding: 20px;
-    border: 1px solid #888;
+    padding: 30px; /* Más padding */
+    border: 1px solid #dee2e6; /* Borde más suave */
     width: 90%;
     max-width: 600px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15); /* Sombra más suave y moderna */
     border-radius: 8px;
     position: relative;
-    color: #343a40; /* <-- AGREGADO: Asegura color de texto oscuro para el contenido del modal */
+    transform: translateY(-50px);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    color: #343a40; /* Color de texto oscuro para el contenido del modal */
 }
 
-/* El .btn-close de Bootstrap ya maneja el cierre, no necesitas .close-button personalizado */
-/* .close-button { ... } */
+.modal.show .modal-content {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.close-button {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #333; /* Más oscuro al pasar el mouse */
+    text-decoration: none;
+}
 
 #product-details-content p {
     margin-bottom: 8px;
-    font-size: 1.1em;
+    font-size: 1.05em; /* Ligeramente más pequeño para detalles */
+    color: #495057;
 }
 
 #product-details-content strong {
-    color: #333;
+    color: #212529; /* Más oscuro para los "strong" */
 }
 
 #detail-description {
     white-space: normal;
-    word-break: break-all;
-    font-style: italic;
-    color: #555;
+    word-break: break-word; /* Asegura que las palabras largas se rompan */
+    color: #6c757d; /* Un gris más suave para la descripción */
     padding: 10px;
     border-radius: 5px;
-    margin-top: 10px;
+    margin-top: 15px; /* Más espacio */
     max-height: 150px;
     overflow-y: auto;
+    background-color: #f8f9fa; /* Fondo ligero para la descripción */
+    border: 1px solid #e9ecef;
+    line-height: 2.4; /* Espaciado de línea más amplio para mejor legibilidad */ 
+}
+
+/* Estilos para el campo de solo lectura en modales */
+.form-control-readonly {
+    background-color: #e9ecef; /* Color de fondo gris claro */
+    cursor: not-allowed;
+    color: #6c757d; /* Texto gris para indicar que no es editable */
+    opacity: 0.8; /* Ligeramente transparente */
+}
+
+
+/* Media Queries para responsividad general (ajustar si ya existe en admin_style.css) */
+@media (max-width: 768px) {
+    .dashboard-layout {
+        flex-direction: column; /* Apilar sidebar y main content en pantallas pequeñas */
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        min-width: 0;
+        position: static; /* Ya no fijo en scroll */
+        padding-bottom: 20px;
+        /* Asegurarse de que el contenido del sidebar se apile correctamente en móviles */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar ul {
+        flex-direction: row; /* Enlaces en fila para móvil si es un menú de navegación horizontal */
+        flex-wrap: wrap; /* Permitir que los enlaces se envuelvan */
+        justify-content: center;
+        margin-top: 20px;
+        flex-grow: 0; /* No ocupar todo el espacio, permitir que el botón siga */
+    }
+
+    .sidebar ul li {
+        width: auto;
+        margin: 5px 10px; /* Ajuste el margen para elementos de lista en fila */
+    }
+
+    .sidebar ul li a {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+
+    .sidebar .logout-button {
+        margin-top: 20px;
+        width: 80%; /* Hacer el botón un poco más pequeño en móvil */
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .main-content {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    .main-content h1,
+    .main-content h2,
+    .main-content h3 {
+        font-size: 1.3em;
+        margin-bottom: 1rem;
+    }
+
+    .content-section {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    .product-table th,
+    .product-table td {
+        padding: 10px;
+        font-size: 0.85em;
+    }
+
+    /* Estilos específicos para la tabla responsiva en pantallas pequeñas */
+    .product-table thead {
+        display: none; /* Oculta el encabezado de la tabla */
+    }
+
+    .product-table tr {
+        display: block;
+        margin-bottom: 15px; /* Espacio entre filas */
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .product-table td {
+        display: block;
+        text-align: right;
+        padding-left: 50%; /* Espacio para la etiqueta */
+        position: relative;
+    }
+
+    .product-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        width: calc(50% - 20px);
+        padding-right: 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: bold;
+        text-align: left;
+        color: #555;
+    }
+
+    .product-table td:last-child {
+        text-align: center; /* Centra los botones de acción */
+    }
+
+    .product-table .btn-action { /* Ajusta ancho de botones en móvil */
+        margin: 5px auto;
+        display: inline-block; /* Para que ocupen su propio espacio */
+    }
+}
+
+/* Ocultar el h2 del sidebar en pantallas pequeñas si no es necesario (opcional) */
+@media (max-width: 576px) {
+    .sidebar h2 {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
+}
+
+
+/* Estilos para el botón "Ver Detalles" en el inventario del empleado */
+.view-details-button {
+    background-color: #007bff; /* Azul, consistente con los botones "Ver Boleta" y "Editar" */
+    color: white;
+    border: none;
+    padding: 8px 15px; /* Ajusta el padding para un buen tamaño */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease; /* Transición suave */
+    font-size: 0.95em; /* Un poco más pequeño si es necesario */
+    white-space: nowrap; /* Evita que el texto se rompa */
+    display: inline-flex; /* Permite centrar contenido si es necesario */
+    align-items: center;
+    justify-content: center;
+}
+
+.view-details-button:hover {
+    background-color: #0056b3; /* Azul más oscuro al pasar el mouse */
+    transform: translateY(-1px); /* Pequeño efecto de elevación */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra al pasar el mouse */
+}
+
+.view-details-button:active {
+    background-color: #004085; /* Azul aún más oscuro al hacer clic */
+    transform: translateY(0); /* Vuelve a la posición original */
+    box-shadow: none; /* Elimina la sombra al hacer clic */
 }

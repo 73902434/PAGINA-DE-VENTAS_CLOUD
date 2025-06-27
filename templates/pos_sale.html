@@ -88,6 +88,94 @@
     }
 
     /* ***** FIN DEL CSS DEL LOGO ***** */
+
+    /* ***** MEJORAS PARA EL BOTÓN "Añadir al Carrito" ***** */
+    .add-to-cart-button {
+        background-color: #28a745; /* Un verde vibrante, común para "añadir" */
+        color: white;
+        padding: 8px 15px; /* Espaciado cómodo */
+        border: none;
+        border-radius: 5px; /* Bordes ligeramente redondeados */
+        cursor: pointer;
+        font-size: 0.95em; /* Un poco más grande que el por defecto */
+        transition: background-color 0.2s ease, transform 0.1s ease; /* Transición suave al hover y click */
+        /* display: block; /* Si quieres que ocupe todo el ancho de su celda */
+        /* width: 100%; */
+        white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
+    }
+
+    .add-to-cart-button:hover {
+        background-color: #218838; /* Un verde un poco más oscuro al pasar el ratón */
+        transform: translateY(-1px); /* Ligero levantamiento */
+    }
+
+    .add-to-cart-button:active {
+        background-color: #1e7e34; /* Verde más oscuro al hacer click */
+        transform: translateY(0); /* Vuelve a su posición original */
+    }
+
+    .add-to-cart-button:disabled {
+        background-color: #cccccc; /* Gris para deshabilitado */
+        color: #666666;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Estilo para los botones de "Eliminar" en el carrito, para que sean consistentes */
+    .button.remove-from-cart {
+        background-color: #dc3545; /* Rojo para "eliminar" */
+        color: white;
+        padding: 6px 12px; /* Un poco más pequeño que añadir */
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9em;
+        transition: background-color 0.2s ease;
+    }
+
+    .button.remove-from-cart:hover {
+        background-color: #c82333;
+    }
+
+    .button.remove-from-cart:active {
+        background-color: #bd2130;
+    }
+
+    /* Pequeña mejora para las tablas para que los botones queden mejor alineados */
+    .product-table td,
+    .cart-table td {
+        vertical-align: middle; /* Centra el contenido verticalmente en las celdas */
+    }
+
+    /* Asegurar que las tablas tengan un estilo base */
+    .product-table, .cart-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+
+    .product-table th, .product-table td,
+    .cart-table th, .cart-table td {
+        border: 1px solid #e9ecef;
+        padding: 12px;
+        text-align: left;
+    }
+
+    .product-table thead th,
+    .cart-table thead th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+
+    .product-table tbody tr:nth-child(odd),
+    .cart-table tbody tr:nth-child(odd) {
+        background-color: #f9f9f9;
+    }
+
+    .product-table tbody tr:hover,
+    .cart-table tbody tr:hover {
+        background-color: #e6f7ff; /* Un azul claro al pasar el ratón */
+    }
 </style>
 {% endblock %}
 

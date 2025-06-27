@@ -10,26 +10,26 @@
     /* Estilos específicos para la gestión de usuarios */
     .user-management-container {
         padding: 20px;
-        background-color: #f8f9fa;
+        background-color: #ffffff; /* Fondo BLANCO PURO para el área principal de gestión de usuarios */
         border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Sombra suave para dar profundidad */
         margin-top: 20px;
     }
 
     .user-list-section {
-        background-color: #fff;
+        background-color: #e9ecef; /* ¡NUEVO COLOR: Gris claro más VISIBLE para el contenedor de la lista de usuarios! */
         border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra suave para que se distinga del fondo */
         padding: 25px;
         margin-bottom: 20px;
     }
 
     .user-list-section h3 {
-        color: #333;
+        color: #007bff; /* Color azul para el título "Lista de Usuarios" */
         margin-bottom: 20px;
         text-align: center;
         font-size: 1.5em;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid #d4d4d4; /* Borde más oscuro para el título para mayor contraste */
         padding-bottom: 10px;
     }
 
@@ -45,14 +45,14 @@
 
     .user-table th,
     .user-table td {
-        border: 1px solid #e0e0e0;
+        border: 1px solid #d4d4d4; /* Bordes de tabla más visibles */
         padding: 12px 15px;
         text-align: left;
         vertical-align: middle;
     }
 
     .user-table th {
-        background-color: #f2f2f2;
+        background-color: #dcdcdc; /* Encabezado de tabla más notorio */
         color: #333;
         font-weight: bold;
         text-transform: uppercase;
@@ -60,15 +60,15 @@
     }
 
     .user-table tr:nth-child(even) {
-        background-color: #f9f9f9;
+        background-color: #f2f2f2; /* Filas pares de la tabla con un gris claro */
     }
 
     .user-table tr:hover {
-        background-color: #f1f1f1;
+        background-color: #e0e0e0; /* Efecto hover para filas de tabla, ligeramente más oscuro */
     }
 
     .btn-add-user {
-        background-color: #007bff;
+        background-color: #007bff; /* Azul para el botón "Nuevo Registro de Usuario" */
         color: white;
         padding: 10px 20px;
         border: none;
@@ -100,7 +100,7 @@
     }
 
     .btn-edit-user {
-        background-color: #ffc107;
+        background-color: #ffc107; /* Amarillo para editar */
         color: #333;
     }
 
@@ -109,7 +109,7 @@
     }
 
     .btn-delete-user {
-        background-color: #dc3545;
+        background-color: #dc3545; /* Rojo para eliminar */
         color: white;
     }
 
@@ -119,16 +119,13 @@
 
     /* Estilos para el nuevo botón Activar */
     .btn-activate-user {
-        background-color: #28a745;
-        /* Color verde */
+        background-color: #28a745; /* Color verde */
         color: white;
     }
 
     .btn-activate-user:hover {
-        background-color: #218838;
-        /* Verde más oscuro al pasar el ratón */
+        background-color: #218838; /* Verde más oscuro al pasar el ratón */
     }
-
 
     @media (max-width: 768px) {
         .user-list-section {
@@ -177,39 +174,29 @@
     /* Estilos para el Modal: Aplicamos !important a todas las propiedades críticas */
     .force-modal-overlay {
         display: none !important;
-        /* Empezar oculto y forzado */
         position: fixed !important;
-        /* Posición fija para cubrir la ventana */
         z-index: 99999 !important;
-        /* Z-index MUY ALTO */
         left: 0 !important;
         top: 0 !important;
         width: 100% !important;
         height: 100% !important;
         overflow: auto !important;
-        /* Permite scroll si el contenido es grande */
         background-color: rgba(0, 0, 0, 0.7) !important;
-        /* Fondo semitransparente oscuro, forzado */
         padding-top: 60px !important;
     }
 
     .force-modal-content {
-        background-color: #fefefe !important;
+        background-color: #e9ecef !important; /* Fondo del modal también en el color visible */
         margin: 5% auto !important;
-        /* 5% desde arriba y centrado, forzado */
         padding: 25px !important;
         border: 1px solid #888 !important;
         border-radius: 12px !important;
         width: 90% !important;
-        /* Ancho ajustable, forzado */
         max-width: 550px !important;
-        /* Máximo ancho para escritorios, forzado */
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
         position: relative !important;
         z-index: 100000 !important;
-        /* Z-index AÚN MÁS ALTO para el contenido, forzado */
         animation: fadeInScale 0.3s ease-out forwards;
-        /* Animación, forzada */
     }
 
     /* Animación para el modal */
@@ -250,11 +237,7 @@
     .force-modal-content input[type="email"],
     .force-modal-content input[type="tel"],
     .force-modal-content input[type="password"],
-    /* Añadir estilo para password */
-    .force-modal-content select
-
-    /* Añadir estilo para select */
-        {
+    .force-modal-content select {
         width: 100%;
         padding: 12px;
         border: 1px solid #ccc;
@@ -268,18 +251,14 @@
     .force-modal-content input[type="email"]:focus,
     .force-modal-content input[type="tel"]:focus,
     .force-modal-content input[type="password"]:focus,
-    /* Añadir estilo para password */
-    .force-modal-content select:focus
-
-    /* Añadir estilo para select */
-        {
+    .force-modal-content select:focus {
         border-color: #007bff;
         box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
         outline: none;
     }
 
     .force-modal-content input[readonly] {
-        background-color: #e9ecef !important;
+        background-color: #dcdcdc !important; /* Un gris más oscuro para campos no editables */
         cursor: not-allowed !important;
         opacity: 0.8;
     }
@@ -365,23 +344,15 @@
     /* Estilos específicos para el logo en el sidebar del dashboard */
     .sidebar-logo-container {
         padding: 10px 0;
-        /* Espaciado interno para el logo */
         text-align: center;
-        /* Centrar la imagen dentro del contenedor */
         margin-bottom: 20px;
-        /* Espacio entre el logo y el título "Menú Administrador" */
     }
 
     .sidebar-logo-container img {
-
         max-width: 80%;
-        /* Ajusta el tamaño máximo de la imagen al 80% del contenedor */
         height: auto;
-        /* Mantiene la proporción de la imagen */
         display: block;
-        /* Asegura que 'margin: auto' funcione para centrar la imagen */
         margin: 0 auto;
-        /* Centrar la imagen horizontalmente */
     }
 </style>
 {% endblock %}

@@ -10,14 +10,14 @@
     /* Estilos específicos para la gestión de productos */
     .product-management-container {
         padding: 20px;
-        background-color: #f8f9fa;
+        background-color: #f0f2f5; /* Un gris muy claro para el fondo del área de gestión */
         border-radius: 8px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
     .product-form,
     .product-list-section {
-        background-color: #fff;
+        background-color: #e9ecef; /* ¡NUEVO COLOR: Gris claro más VISIBLE! */
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         padding: 25px;
@@ -26,11 +26,11 @@
 
     .product-form h3,
     .product-list-section h3 {
-        color: #333;
+        color: #007bff; /* Color azul para los títulos "Añadir Nuevo Producto" y "Lista de Productos" */
         margin-bottom: 20px;
         text-align: center;
         font-size: 1.5em;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid #dcdfe3; /* Borde más oscuro para el título para mayor contraste */
         padding-bottom: 10px;
     }
 
@@ -62,8 +62,7 @@
     }
 
     .btn-submit {
-        background-color: #28a745;
-        /* Verde para añadir */
+        background-color: #28a745; /* Verde para añadir */
         color: white;
         padding: 10px 20px;
         border: none;
@@ -90,8 +89,7 @@
     }
 
     .btn-edit {
-        background-color: #007bff;
-        /* Azul para editar */
+        background-color: #007bff; /* Azul para editar */
         color: white;
     }
 
@@ -100,8 +98,7 @@
     }
 
     .btn-delete {
-        background-color: #dc3545;
-        /* Rojo para eliminar */
+        background-color: #dc3545; /* Rojo para eliminar */
         color: white;
     }
 
@@ -122,14 +119,14 @@
 
     .product-table th,
     .product-table td {
-        border: 1px solid #e0e0e0;
+        border: 1px solid #d4d4d4; /* Bordes de tabla más visibles */
         padding: 12px 15px;
         text-align: left;
         vertical-align: middle;
     }
 
     .product-table th {
-        background-color: #f2f2f2;
+        background-color: #dcdcdc; /* Encabezado de tabla más notorio */
         color: #333;
         font-weight: bold;
         text-transform: uppercase;
@@ -137,11 +134,11 @@
     }
 
     .product-table tr:nth-child(even) {
-        background-color: #f9f9f9;
+        background-color: #f2f2f2; /* Filas pares de la tabla con un gris claro */
     }
 
     .product-table tr:hover {
-        background-color: #f1f1f1;
+        background-color: #e9ecef; /* Efecto hover para filas de tabla, igual al nuevo fondo de contenedor */
     }
 
     /* ********************************************* */
@@ -152,39 +149,28 @@
     .product-edit-modal {
         /* Fondo del modal */
         display: flex;
-        /* Usamos flexbox para centrar el contenido */
         align-items: center;
-        /* Centrar verticalmente */
         justify-content: center;
-        /* Centrar horizontalmente */
         position: fixed;
         z-index: 1000;
-        /* Asegura que esté por encima de otros elementos */
         left: 0;
         top: 0;
         width: 100%;
         height: 100%;
         background-color: rgba(0, 0, 0, 0.6);
-        /* Fondo semi-transparente */
         visibility: hidden;
-        /* Oculto por defecto */
         opacity: 0;
-        /* Opacidad para la transición */
         transition: opacity 0.3s ease, visibility 0.3s ease;
-        /* Transición suave */
         overflow: auto;
-        /* Permite scroll si el contenido es demasiado grande */
     }
 
     .product-edit-modal.is-active {
-        /* Clase que activa la visibilidad del modal */
         visibility: visible;
         opacity: 1;
     }
 
     .product-edit-modal-content {
-        /* Contenido del modal */
-        background-color: #fefefe;
+        background-color: #e9ecef; /* Fondo del modal de edición también en el nuevo gris claro visible */
         padding: 30px;
         border: 1px solid #888;
         border-radius: 10px;
@@ -193,23 +179,16 @@
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         position: relative;
         transform: translateY(-50px);
-        /* Efecto de entrada: empieza un poco arriba */
         opacity: 0;
-        /* Efecto de entrada: empieza invisible */
         transition: transform 0.3s ease, opacity 0.3s ease;
-        /* Transición para el contenido */
     }
 
     .product-edit-modal.is-active .product-edit-modal-content {
-        /* Animación del contenido cuando el modal está activo */
         transform: translateY(0);
-        /* Vuelve a su posición original */
         opacity: 1;
-        /* Se hace completamente visible */
     }
 
     .product-edit-modal-content .close-button {
-        /* Botón de cerrar dentro del modal */
         color: #aaa;
         position: absolute;
         top: 10px;
@@ -228,14 +207,11 @@
 
     /* Estilo para campos de solo lectura */
     .form-control-readonly {
-        background-color: #e9ecef;
-        /* Un color de fondo gris claro */
+        background-color: #dcdcdc; /* Un gris aún más oscuro para campos no editables para contrastar */
         cursor: not-allowed;
-        /* Indicador de que no se puede editar */
         width: 100%;
-        /* Asegurarse de que tenga el mismo ancho */
         padding: 10px;
-        border: 1px solid #ddd;
+        border: 1px solid #c0c0c0;
         border-radius: 4px;
         box-sizing: border-box;
         font-size: 1em;
@@ -285,7 +261,6 @@
         }
 
         .product-edit-modal-content {
-            /* La media query también aplica a la nueva clase */
             width: 95%;
             padding: 20px;
         }
@@ -294,23 +269,15 @@
     /* Estilos específicos para el logo en el sidebar del dashboard */
     .sidebar-logo-container {
         padding: 10px 0;
-        /* Espaciado interno para el logo */
         text-align: center;
-        /* Centrar la imagen dentro del contenedor */
         margin-bottom: 20px;
-        /* Espacio entre el logo y el título "Menú Administrador" */
     }
 
     .sidebar-logo-container img {
-
         max-width: 80%;
-        /* Ajusta el tamaño máximo de la imagen al 80% del contenedor */
         height: auto;
-        /* Mantiene la proporción de la imagen */
         display: block;
-        /* Asegura que 'margin: auto' funcione para centrar la imagen */
         margin: 0 auto;
-        /* Centrar la imagen horizontalmente */
     }
 </style>
 {% endblock %}
@@ -321,7 +288,7 @@
         <div class="sidebar-logo-container">
             <img src="{{ url_for('static', filename='img/logo_v2.png') }}" alt="Logo de VentasPlus S.A.C.">
         </div>
-        
+
         <div class="sidebar-logo">
             <h2>Menú Administrador</h2>
         </div>
@@ -567,4 +534,4 @@
         console.log('--- Script de manage_products.html FINALIZADO (DOMContentLoaded) ---');
     });
 </script>
-{% endblock %} {# Cierra el block scripts #}
+{% endblock %}
