@@ -11,9 +11,9 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'una_clave_secreta_muy_larga_y_aleatoria_para_desarrollo_local_2024')
 
 # --- Configuración de la base de datos (tomada de variables de entorno) ---
-DB_HOST = os.environ.get('DB_HOST', 'localhost')
-DB_USER = os.environ.get('DB_USER', 'root')
-DB_PASSWORD = os.environ.get('DB_PASSWORD', '123456')
+DB_HOST = os.environ.get('DB_HOST', 'dbsistemaventas.mysql.database.azure.com')
+DB_USER = os.environ.get('DB_USER', 'adminventas')
+DB_PASSWORD = os.environ.get('DB_PASSWORD', 'BdVentas2024!')  # Reemplázalo si estás local
 DB_NAME = os.environ.get('DB_NAME', 'facturacion_db')
 
 # Función para establecer la conexión a la base de datos
