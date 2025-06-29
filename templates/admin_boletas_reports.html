@@ -426,7 +426,7 @@
                                 <td data-label="Fecha">{{ sale.sale_date_formatted }}</td>
                                 <td data-label="Empleado">{{ sale.employee_first_name }} {{ sale.employee_last_name }}
                                 </td>
-                                <td data-label="Monto Total">${{ "%.2f"|format(sale.total_amount) }}</td>
+                                <td data-label="Monto Total">S/.{{ "%.2f"|format(sale.total_amount) }}</td>
                                 <td data-label="Método de Pago">{{ sale.payment_method }}</td>
                                 <td data-label="Estado">
                                     {% if sale.is_cancelled %}
