@@ -5,12 +5,226 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='empleado_style.css') }}">
+<style>
+   /* ***** CSS AGREGADO AQUÍ PARA EL LOGO DIRECTAMENTE EN EL HTML ***** */
+.sidebar-logo {
+    max-width: 80%;
+    /* Ajusta este valor si es necesario para tu logo */
+    height: auto;
+    /* Mantiene la proporción de la imagen */
+    display: block;
+    /* Para centrarlo con margin auto */
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+    /* Espacio debajo del logo */
+    object-fit: contain;
+    /* Asegura que la imagen se ajuste sin recortarse */
+}
+
+/* ***** FIN DEL CSS DEL LOGO ***** */
+
+/* Estilos adicionales para contenedores y títulos */
+.dashboard-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    /* Light background for the dashboard */
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #343a40;
+    /* Dark sidebar */
+    color: #ffffff;
+    padding: 20px;
+    flex-shrink: 0;
+}
+
+.sidebar-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sidebar-header h2 {
+    color: #ffffff;
+    font-size: 1.5rem;
+    margin-top: 10px;
+}
+
+/* Las siguientes reglas que afectan directamente a los enlaces de navegación del sidebar (color, hover, padding específico de dropdown) han sido ELIMINADAS.
+   Manteniendo las propiedades generales como list-style y padding en el ul, y margin-bottom en los li,
+   para preservar la estructura pero sin los estilos visuales de los enlaces.
+*/
+
+.sidebar-nav {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar-item {
+    margin-bottom: 10px;
+}
+
+
+
+.sidebar-dropdown {
+    background-color: #495057; /* Se mantiene solo el fondo del dropdown si es deseado */
+    margin-top: 5px;
+    border-radius: 5px;
+}
+
+
+
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+.content {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    /* Soft shadow for content card */
+}
+
+h1.fw-bold.fs-4.mb-3 {
+    color: #343a40;
+    /* Darker color for main titles */
+    font-size: 1.8rem !important;
+    margin-bottom: 25px !important;
+    border-bottom: 2px solid #007bff;
+    /* Blue underline for main title */
+    padding-bottom: 10px;
+}
+
+.card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+    background-color: #007bff;
+    /* Blue header for cards */
+    color: #ffffff;
+    font-weight: bold;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: 8px 8px 0 0;
+    padding: 15px 20px;
+}
+
+.card-header h5.card-title {
+    margin-bottom: 0;
+    font-size: 1.25rem;
+}
+
+.form-control {
+    border-radius: 5px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    border-radius: 5px;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    border-radius: 5px;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.table {
+    margin-top: 20px;
+}
+
+.table thead th {
+    background-color: #e9ecef;
+    /* Light gray for table headers */
+    color: #495057;
+    font-weight: bold;
+    vertical-align: middle;
+}
+
+.table tbody tr:hover {
+    background-color: #f2f2f2;
+    /* Subtle highlight on row hover */
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    color: #ffffff;
+    border-radius: 4px;
+    padding: 5px 10px;
+}
+
+.btn-info:hover {
+    background-color: #138496;
+    border-color: #117a8b;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: #ffffff;
+    border-radius: 4px;
+    padding: 5px 10px;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+.modal-content {
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    background-color: #007bff;
+    color: #ffffff;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+}
+
+.modal-header .btn-close {
+    filter: invert(1);
+    /* Make close button white */
+}
+
+.modal-title {
+    font-weight: bold;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+.alert {
+    border-radius: 5px;
+}
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-layout"> {# Usa la clase "dashboard-layout" para coincidir con tu CSS #}
     <aside class="sidebar"> {# Usa la clase "sidebar" para coincidir con tu CSS #}
-        <div class="sidebar-logo"> {# ¡REINSTALADO! Aquí va el título de la barra lateral. #}
+        <div class="sidebar-header">
+            <img src="{{ url_for('static', filename='img/logo_v2.png') }}" alt="Logo VentasPlus" class="sidebar-logo">
             <h2>Menú Empleado</h2>
         </div>
         <ul class="sidebar-nav">

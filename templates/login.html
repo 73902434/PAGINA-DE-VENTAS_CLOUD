@@ -2,12 +2,9 @@
 
 {% block title %}Iniciar Sesión{% endblock %}
 
-{# NUEVO: Añadimos una clase a la etiqueta <main> solo para la página de login #}
 {% block main_class %}centered-main-content{% endblock %} 
 
 {% block extra_css %}
-    {# ¡IMPORTANTE! Si 'login_style.css' fue el que causó que el login se fuera a la izquierda, #}
-    {# asegúrate de que esté comentado o revisado para que no cause conflictos. #}
     <link rel="stylesheet" href="{{ url_for('static', filename='login_style.css') }}"> 
 {% endblock %}
 
@@ -15,7 +12,11 @@
     <div class="page-content-wrapper"> 
         <div class="login-container"> 
             {% include 'messages.html' %} 
-
+            
+            <div class="company-logo">
+                <img src="{{ url_for('static', filename='img/logo_ventasplus.png') }}" alt="Logo de VentasPlus S.A.C.">
+            </div> 
+            
             <h1>Iniciar Sesión</h1>
             <form method="POST" action="{{ url_for('login') }}">
                 <div class="form-group">
@@ -28,9 +29,7 @@
                 </div>
                 <button type="submit" class="button">Entrar</button>
             </form>
-            <div class="test-users-info">
-                <p>Usuarios de prueba: usuario1 / pass123 | admin / admin000</p>
-            </div>
+            
         </div>
     </div>
 {% endblock %}

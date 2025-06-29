@@ -6,11 +6,32 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='empleado_style.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='admin_style.css') }}">
+<style>
+    /* Estilos específicos para el logo en el sidebar del dashboard */
+    .sidebar-logo-container {
+        padding: 10px 0; /* Espaciado interno para el logo */
+        text-align: center; /* Centrar la imagen dentro del contenedor */
+        margin-bottom: 20px; /* Espacio entre el logo y el título "Menú Administrador" */
+    }
+
+    .sidebar-logo-container img {
+        
+        max-width: 80%; /* Ajusta el tamaño máximo de la imagen al 80% del contenedor */
+        height: auto; /* Mantiene la proporción de la imagen */
+        display: block; /* Asegura que 'margin: auto' funcione para centrar la imagen */
+        margin: 0 auto; /* Centrar la imagen horizontalmente */
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-layout">
     <aside class="sidebar">
+        
+        <div class="sidebar-logo-container">
+            <img src="{{ url_for('static', filename='img/logo_v2.png') }}" alt="Logo de VentasPlus S.A.C.">
+        </div>
+
         <div class="sidebar-logo">
             <h2>Menú Administrador</h2>
         </div>
@@ -43,7 +64,7 @@
                     <span>Reportes y Boletas</span>
                 </a>
             </li>
-            
+
         </ul>
         <p style="text-align: center; margin-top: 30px;"><a href="{{ url_for('logout') }}"
                 class="button secondary">Cerrar Sesión</a></p>
@@ -64,7 +85,7 @@
                     <div class="stats-grid">
                         <div class="stat-item">
                             <h3>Ventas de Hoy</h3>
-                           <p>S/. {{ "%.2f"|format(stats.total_sales_today) }}</p>
+                            <p>S/. {{ "%.2f"|format(stats.total_sales_today) }}</p>
                         </div>
                         <div class="stat-item">
                             <h3>Empleados Activos</h3>
@@ -97,27 +118,27 @@
                     <div class="stats-grid"> {# Un nuevo stats-grid para estos tres cuadros #}
                         <div class="stat-item">
                             <h3>Empleado Top Ventas (Hoy)</h3>
-                            <p>{{ stats.get('top_employee_sales', {}).get('name', 'Nadie ha vendido aún') }}</p> {# <---
-                                CORREGIDO AQUÍ #} <p>${{ "%.2f"|format(stats.get('top_employee_sales',
+                            <p>{{ stats.get('top_employee_sales', {}).get('name', 'Nadie ha vendido aún') }}</p>
+                            <p>S/.{{ "%.2f"|format(stats.get('top_employee_sales',
                                 {}).get('total_sales', 0)) }}</p> {# <--- Y CORREGIDO AQUÍ #} </div>
-                                    <div class="stat-item">
-                                        <h3>Empleado Top Ventas (Semana)</h3>
-                                        {# Si aún no tienes top_employee_sales_week en app.py, estos seguirán mostrando
-                                        'N/A' #}
-                                        <p>{{ stats.get('top_employee_sales_week', {}).get('name', 'Nadie ha vendido
-                                            aún') }}</p>
-                                        <p>${{ "%.2f"|format(stats.get('top_employee_sales_week', {}).get('total_sales',
-                                            0)) }}</p>
-                                    </div>
-                                    <div class="stat-item">
-                                        <h3>Empleado Top Ventas (Mes)</h3>
-                                        {# Si aún no tienes top_employee_sales_month en app.py, estos seguirán mostrando
-                                        'N/A' #}
-                                        <p>{{ stats.get('top_employee_sales_month', {}).get('name', 'Nadie ha vendido
-                                            aún') }}</p>
-                                        <p>${{ "%.2f"|format(stats.get('top_employee_sales_month',
-                                            {}).get('total_sales', 0)) }}</p>
-                                    </div>
+                                <div class="stat-item">
+                                    <h3>Empleado Top Ventas (Semana)</h3>
+                                    {# Si aún no tienes top_employee_sales_week en app.py, estos seguirán mostrando
+                                    'N/A' #}
+                                    <p>{{ stats.get('top_employee_sales_week', {}).get('name', 'Nadie ha vendido
+                                        aún') }}</p>
+                                    <p>S/.{{ "%.2f"|format(stats.get('top_employee_sales_week', {}).get('total_sales',
+                                        0)) }}</p>
+                                </div>
+                                <div class="stat-item">
+                                    <h3>Empleado Top Ventas (Mes)</h3>
+                                    {# Si aún no tienes top_employee_sales_month en app.py, estos seguirán mostrando
+                                    'N/A' #}
+                                    <p>{{ stats.get('top_employee_sales_month', {}).get('name', 'Nadie ha vendido
+                                        aún') }}</p>
+                                    <p>S/.{{ "%.2f"|format(stats.get('top_employee_sales_month',
+                                        {}).get('total_sales', 0)) }}</p>
+                                </div>
                         </div>
                     </div>
 

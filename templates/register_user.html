@@ -12,11 +12,9 @@
     /* Estilos específicos para el formulario de registro de usuario */
     .register-form-container {
         max-width: 600px;
-        /* Un poco más ancho para mejor presentación */
         margin: 20px auto;
-        /* Reducir margen superior para ajustarse al layout */
         padding: 30px;
-        background-color: #fff;
+        background-color: #e9ecef; /* ¡NUEVO COLOR: Gris claro más VISIBLE para el contenedor del formulario! */
         border-radius: 8px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
@@ -24,10 +22,9 @@
     .register-form-container h2 {
         text-align: center;
         margin-bottom: 25px;
-        color: #333;
+        color: #007bff; /* Color azul para el título "Registrar Nuevo Usuario" */
         font-size: 1.8em;
-        border-bottom: 1px solid #eee;
-        /* Línea de separación para el título */
+        border-bottom: 1px solid #d4d4d4; /* Línea de separación más visible para el título */
         padding-bottom: 10px;
     }
 
@@ -39,7 +36,7 @@
         display: block;
         margin-bottom: 5px;
         font-weight: bold;
-        color: #555;
+        color: #333; /* Color de texto más oscuro para las etiquetas */
     }
 
     .form-group input[type="text"],
@@ -47,35 +44,28 @@
     .form-group input[type="email"],
     .form-group input[type="tel"],
     .form-group input[type="number"],
-    /* Añadir si se usa para algo como stock */
     .form-group select,
     .form-group textarea {
-        /* Añadir si se usa para descripciones largas */
         width: 100%;
         padding: 10px;
-        border: 1px solid #ddd;
+        border: 1px solid #ccc; /* Borde más definido para los inputs */
         border-radius: 4px;
         box-sizing: border-box;
-        /* Incluye padding y border en el ancho total */
         font-size: 1em;
+        background-color: #ffffff; /* Fondo blanco para los campos de entrada para que destaquen */
     }
 
     /* Estilos para los botones del formulario */
     .form-buttons {
         display: flex;
-        /* Para alinear los botones horizontalmente */
         justify-content: space-between;
-        /* Espacio entre ellos */
         gap: 15px;
-        /* Espacio entre los botones */
         margin-top: 25px;
     }
 
     .btn-register-submit {
         flex-grow: 1;
-        /* Para que el botón ocupe el espacio disponible */
-        background-color: #28a745;
-        /* Verde para acción principal */
+        background-color: #28a745; /* Verde para el botón "Registrar Usuario" */
         color: white;
         padding: 12px 20px;
         border: none;
@@ -84,7 +74,6 @@
         font-size: 1.1em;
         text-align: center;
         text-decoration: none;
-        /* Si es un enlace */
         transition: background-color 0.3s ease, box-shadow 0.3s ease;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
@@ -96,9 +85,7 @@
 
     .btn-back-to-list {
         flex-grow: 1;
-        /* Para que el botón ocupe el espacio disponible */
-        background-color: #6c757d;
-        /* Gris para "atrás" */
+        background-color: #6c757d; /* Gris para el botón "Volver a Gestión de Usuarios" */
         color: white;
         padding: 12px 20px;
         border: none;
@@ -107,7 +94,6 @@
         font-size: 1.1em;
         text-align: center;
         text-decoration: none;
-        /* Si es un enlace */
         transition: background-color 0.3s ease, box-shadow 0.3s ease;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
@@ -121,15 +107,27 @@
     @media (max-width: 768px) {
         .form-buttons {
             flex-direction: column;
-            /* Apila los botones en pantallas pequeñas */
             gap: 10px;
         }
 
         .register-form-container {
             margin: 20px 10px;
-            /* Margen a los lados en pantallas pequeñas */
             padding: 20px;
         }
+    }
+
+    /* Estilos específicos para el logo en el sidebar del dashboard */
+    .sidebar-logo-container {
+        padding: 10px 0;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .sidebar-logo-container img {
+        max-width: 80%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
     }
 </style>
 {% endblock %}
@@ -138,6 +136,9 @@
 {# Envuelve el contenido del formulario dentro de la estructura de dashboard #}
 <div class="dashboard-layout">
     <aside class="sidebar">
+        <div class="sidebar-logo-container">
+            <img src="{{ url_for('static', filename='img/logo_v2.png') }}" alt="Logo de VentasPlus S.A.C.">
+        </div>
         <div class="sidebar-logo">
             <h2>Menú Administrador</h2>
         </div>

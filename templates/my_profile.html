@@ -6,11 +6,6 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='empleado_style.css') }}">
 <style>
-    /* Se han eliminado estilos de body, html, dashboard-layout, main-content, 
-    y todo lo relacionado con el sidebar y profile-card, 
-    ya que deben ser manejados por empleado_style.css y base.html.
-    */
-
     /* ESTILOS ESPECÍFICOS PARA LA TARJETA DE PERFIL Y SU CONTENIDO */
     .profile-card {
         /* Mantén los estilos existentes de la tarjeta si no están en empleado_style.css */
@@ -92,13 +87,32 @@
         background-color: transparent !important;
         pointer-events: none !important;
     }
+
+    /* ***** CSS AGREGADO AQUÍ PARA EL LOGO DIRECTAMENTE EN EL HTML ***** */
+    .sidebar-logo {
+        max-width: 80%;
+        /* Ajusta este valor si es necesario para tu logo */
+        height: auto;
+        /* Mantiene la proporción de la imagen */
+        display: block;
+        /* Para centrarlo con margin auto */
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 10px;
+        /* Espacio debajo del logo */
+        object-fit: contain;
+        /* Asegura que la imagen se ajuste sin recortarse */
+    }
+
+    /* ***** FIN DEL CSS DEL LOGO ***** */
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-layout">
     <aside class="sidebar">
-        <div class="sidebar-logo">
+        <div class="sidebar-header">
+            <img src="{{ url_for('static', filename='img/logo_v2.png') }}" alt="Logo VentasPlus" class="sidebar-logo">
             <h2>Menú Empleado</h2>
         </div>
         <ul class="sidebar-nav">
