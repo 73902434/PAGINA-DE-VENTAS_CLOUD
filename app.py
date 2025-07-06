@@ -5,6 +5,8 @@ import mysql.connector
 from mysql.connector import Error
 import os
 from datetime import date, datetime, timedelta
+from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
 
 app = Flask(__name__)
 
@@ -55,10 +57,10 @@ def login():
         cursor = conn.cursor(dictionary=True)
 
         try:
-            cursor.execute("SELECT id, username, password_plain, first_name, last_name, role FROM users WHERE username = %s", (username,))
+            cursor.execute("SELECT id, username, password_hash, first_name, last_name, role FROM users WHERE username = %s", (username,))
             user = cursor.fetchone()
 
-            if user and user['password_plain'] == password:
+            if user and check_password_hash(user['password_hash'], password):
                 session['logged_in'] = True
                 session['username'] = user['username']
                 session['first_name'] = user['first_name']
