@@ -5,7 +5,8 @@ import mysql.connector
 from mysql.connector import Error
 import os
 from datetime import date, datetime, timedelta
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
 
 app = Flask(__name__)
 
@@ -13,11 +14,12 @@ app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'una_clave_secreta_muy_larga
 
 # --- Configuración de la base de datos (tomada de variables de entorno) ---
 DB_HOST = os.environ.get('DB_HOST', 'dbsistemaventas.mysql.database.azure.com')
-DB_USER = os.environ.get('DB_USER', 'adminventas@dbsistemaventas')
-DB_PASSWORD = os.environ.get('DB_PASSWORD', 'BdVentas2024!')
+DB_USER = os.environ.get('DB_USER', 'adminventas')
+DB_PASSWORD = os.environ.get('DB_PASSWORD', 'BdVentas2024!')  # Reemplázalo si estás local
 DB_NAME = os.environ.get('DB_NAME', 'facturacion_db')
 
 # Función para establecer la conexión a la base de datos
+# Intentar conexión
 def get_db_connection():
     return mysql.connector.connect(
         host=DB_HOST,
@@ -26,6 +28,7 @@ def get_db_connection():
         database=DB_NAME,
         ssl_ca='DigiCertGlobalRootCA.crt.pem'  # Si estás en local con SSL
     )
+
 
 # --- Rutas de la aplicación ---
 
@@ -53,7 +56,7 @@ def login():
             cursor.execute("SELECT id, username, password_hash, first_name, last_name, role FROM users WHERE username = %s", (username,))
             user = cursor.fetchone()
 
-            if user and user['password_hash'] == password:
+            if user and check_password_hash(user['password_hash'], password):
                 session['logged_in'] = True
                 session['username'] = user['username']
                 session['first_name'] = user['first_name']
@@ -1161,6 +1164,7 @@ def my_profile_view():
 
         cursor = conn.cursor(dictionary=True) 
         print(f"DEBUG: Ejecutando consulta SQL para user_id: {user_id} (con phone, address, email, DNI)")
+        # *** LÍNEA MODIFICADA: AÑADIDO 'dni' a la selección ***
         cursor.execute("SELECT id, username, first_name, last_name, phone, address, email, dni, role FROM users WHERE id = %s", (user_id,))
         user_info = cursor.fetchone()
         
@@ -1332,15 +1336,18 @@ def update_password():
 
         cursor = conn.cursor(dictionary=True)
         # Obtener la contraseña actual de la DB (¡EN TEXTO PLANO!)
-        cursor.execute("SELECT password_hash FROM users WHERE id = %s", (user_id,))
+        # *** CAMBIO AQUÍ: 'password' a 'password_plain' ***
+        cursor.execute("SELECT password_plain FROM users WHERE id = %s", (user_id,))
         user_data = cursor.fetchone()
 
         # Comparar la contraseña actual proporcionada con la almacenada (¡EN TEXTO PLANO!)
-        if not user_data or user_data['password_hash'] != current_password:
+        # *** CAMBIO AQUÍ: 'password' a 'password_plain' ***
+        if not user_data or user_data['password_plain'] != current_password:
             return jsonify({'success': False, 'message': 'Contraseña actual incorrecta.'}), 400
 
         # Si la contraseña actual es correcta, actualizar con la nueva contraseña (¡EN TEXTO PLANO!)
-        cursor.execute("UPDATE users SET password_hash = %s WHERE id = %s", (new_password, user_id))
+        # *** CAMBIO AQUÍ: 'password' a 'password_plain' ***
+        cursor.execute("UPDATE users SET password_plain = %s WHERE id = %s", (new_password, user_id))
         conn.commit()
 
         return jsonify({'success': True, 'message': 'Contraseña actualizada exitosamente.'}), 200
@@ -1805,6 +1812,7 @@ def register_user_view():
                            username='', first_name='', last_name='',
                            email='', phone='', address='', dni='', role='employee')
     
+
 # --- NUEVA RUTA: OBTENER DATOS DE USUARIO PARA EDICIÓN (AJAX) ---
 @app.route('/get_user_data/<int:user_id>', methods=['GET'])
 def get_user_data(user_id):
@@ -1880,7 +1888,7 @@ def edit_user(user_id):
 
         if new_password:
             # Si hay una nueva contraseña, añadirla a la consulta y a los parámetros
-            set_clauses.append("password_hash = %s") 
+            set_clauses.append("password_plain = %s") # CORREGIDO: Usar 'password_plain'
             params.append(new_password)
 
         query = f"UPDATE users SET {', '.join(set_clauses)} WHERE id = %s"
