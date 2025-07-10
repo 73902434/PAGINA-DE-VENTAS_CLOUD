@@ -1749,29 +1749,27 @@ def register_user_view():
     # Solo administradores pueden registrar usuarios
     if not user_id or user_role != 'admin':
         flash('Acceso denegado. Solo los administradores pueden registrar nuevos usuarios.', 'danger')
-        return redirect(url_for('login_view')) # O a tu dashboard de admin
+        return redirect(url_for('login_view'))
 
     if request.method == 'POST':
         # Obtener los datos del formulario
         username = request.form.get('username')
         password = request.form.get('password')
+        hashed_password = generate_password_hash(password)  # ✅ Hashear la contraseña aquí
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
         email = request.form.get('email')
         phone = request.form.get('phone')
         address = request.form.get('address')
-        dni = request.form.get('dni') # <-- AÑADIDO: Obtener el DNI
-        role = request.form.get('role', 'employee') # Valor por defecto 'employee'
+        dni = request.form.get('dni')
+        role = request.form.get('role', 'employee')
 
-        # Validaciones básicas de campos obligatorios
-        # 'dni' no es obligatorio en la base de datos, así que no se valida aquí a menos que quieras
-        # que sea obligatorio en el formulario.
         if not all([username, password, first_name, last_name, email, role]):
             flash('Por favor, complete todos los campos obligatorios.', 'danger')
             return render_template('register_user.html',
                                    username=username, first_name=first_name,
                                    last_name=last_name, email=email,
-                                   phone=phone, address=address, dni=dni, role=role) # <-- AÑADIDO: pasar dni
+                                   phone=phone, address=address, dni=dni, role=role)
 
         conn = None
         cursor = None
@@ -1787,18 +1785,16 @@ def register_user_view():
                 return render_template('register_user.html',
                                        username=username, first_name=first_name,
                                        last_name=last_name, email=email,
-                                       phone=phone, address=address, dni=dni, role=role) # <-- AÑADIDO: pasar dni
+                                       phone=phone, address=address, dni=dni, role=role)
 
-            # Insertar el nuevo usuario en la base de datos
-            # El orden de las columnas aquí DEBE coincidir con el orden de las variables en la tupla
-            # y con los nombres EXACTOS de las columnas en tu base de datos.
+            # ✅ Usar el hash en lugar de la contraseña en texto plano
             cursor.execute(
                 "INSERT INTO users (username, password_hash, first_name, last_name, email, phone, address, dni, role) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (username, password, first_name, last_name, email, phone, address, dni, role) # <-- AÑADIDO: dni y datetime.now()
+                (username, hashed_password, first_name, last_name, email, phone, address, dni, role)
             )
             conn.commit()
             flash('Usuario registrado exitosamente!', 'success')
-            return redirect(url_for('manage_users_view')) # Redirigir a la vista de gestión de usuarios
+            return redirect(url_for('manage_users_view'))
 
         except mysql.connector.Error as err:
             flash(f"Error de base de datos al registrar el usuario: {err}", "danger")
@@ -1812,11 +1808,9 @@ def register_user_view():
             if conn:
                 conn.close()
 
-    # Para solicitudes GET, simplemente muestra el formulario de registro vacío (o con datos si hubo error)
     return render_template('register_user.html',
                            username='', first_name='', last_name='',
-                           email='', phone='', address='', dni='', role='employee') 
-
+                           email='', phone='', address='', dni='', role='employee')
 # --- NUEVA RUTA: OBTENER DATOS DE USUARIO PARA EDICIÓN (AJAX) ---
 @app.route('/get_user_data/<int:user_id>', methods=['GET'])
 def get_user_data(user_id):
