@@ -18,19 +18,13 @@ DB_NAME = os.environ.get('DB_NAME', 'facturacion_db')
 
 # Función para establecer la conexión a la base de datos
 def get_db_connection():
-    try:
-        conn = mysql.connector.connect(
-            host=DB_HOST,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            database=DB_NAME
-        )
-        if conn.is_connected():
-            return conn
-    except Error as e:
-        print(f"Error al conectar a la base de datos: {e}")
-        flash(f"Error de conexión a la base de datos: {e}", 'danger')
-        return None
+    return mysql.connector.connect(
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        database=DB_NAME,
+        ssl_ca='DigiCertGlobalRootCA.crt.pem'  # Si estás en local con SSL
+    )
 
 # --- Rutas de la aplicación ---
 
