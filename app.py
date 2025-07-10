@@ -11,22 +11,26 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'una_clave_secreta_muy_larga_y_aleatoria_para_desarrollo_local_2024')
 
 # --- Configuración de la base de datos (tomada de variables de entorno) ---
-DB_HOST = os.environ.get('DB_HOST', 'dbsistemaventas.mysql.database.azure.com')
-DB_USER = os.environ.get('DB_USER', 'adminventas')
-DB_PASSWORD = os.environ.get('DB_PASSWORD', 'BdVentas2024!')  # Reemplázalo si estás local
+DB_HOST = os.environ.get('DB_HOST', 'localhost')
+DB_USER = os.environ.get('DB_USER', 'root')
+DB_PASSWORD = os.environ.get('DB_PASSWORD', '123456')
 DB_NAME = os.environ.get('DB_NAME', 'facturacion_db')
 
 # Función para establecer la conexión a la base de datos
-# Intentar conexión
 def get_db_connection():
-    return mysql.connector.connect(
-        host=DB_HOST,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        database=DB_NAME,
-        ssl_ca='DigiCertGlobalRootCA.crt.pem'  # Si estás en local con SSL
-    )
-
+    try:
+        conn = mysql.connector.connect(
+            host=DB_HOST,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            database=DB_NAME
+        )
+        if conn.is_connected():
+            return conn
+    except Error as e:
+        print(f"Error al conectar a la base de datos: {e}")
+        flash(f"Error de conexión a la base de datos: {e}", 'danger')
+        return None
 
 # --- Rutas de la aplicación ---
 
@@ -1162,7 +1166,6 @@ def my_profile_view():
 
         cursor = conn.cursor(dictionary=True) 
         print(f"DEBUG: Ejecutando consulta SQL para user_id: {user_id} (con phone, address, email, DNI)")
-        # *** LÍNEA MODIFICADA: AÑADIDO 'dni' a la selección ***
         cursor.execute("SELECT id, username, first_name, last_name, phone, address, email, dni, role FROM users WHERE id = %s", (user_id,))
         user_info = cursor.fetchone()
         
@@ -1334,18 +1337,15 @@ def update_password():
 
         cursor = conn.cursor(dictionary=True)
         # Obtener la contraseña actual de la DB (¡EN TEXTO PLANO!)
-        # *** CAMBIO AQUÍ: 'password' a 'password_plain' ***
-        cursor.execute("SELECT password_plain FROM users WHERE id = %s", (user_id,))
+        cursor.execute("SELECT password_hash FROM users WHERE id = %s", (user_id,))
         user_data = cursor.fetchone()
 
         # Comparar la contraseña actual proporcionada con la almacenada (¡EN TEXTO PLANO!)
-        # *** CAMBIO AQUÍ: 'password' a 'password_plain' ***
-        if not user_data or user_data['password_plain'] != current_password:
+        if not user_data or user_data['password_hash'] != current_password:
             return jsonify({'success': False, 'message': 'Contraseña actual incorrecta.'}), 400
 
         # Si la contraseña actual es correcta, actualizar con la nueva contraseña (¡EN TEXTO PLANO!)
-        # *** CAMBIO AQUÍ: 'password' a 'password_plain' ***
-        cursor.execute("UPDATE users SET password_plain = %s WHERE id = %s", (new_password, user_id))
+        cursor.execute("UPDATE users SET password_hash = %s WHERE id = %s", (new_password, user_id))
         conn.commit()
 
         return jsonify({'success': True, 'message': 'Contraseña actualizada exitosamente.'}), 200
@@ -1747,29 +1747,27 @@ def register_user_view():
     # Solo administradores pueden registrar usuarios
     if not user_id or user_role != 'admin':
         flash('Acceso denegado. Solo los administradores pueden registrar nuevos usuarios.', 'danger')
-        return redirect(url_for('login_view')) # O a tu dashboard de admin
+        return redirect(url_for('login_view'))
 
     if request.method == 'POST':
         # Obtener los datos del formulario
         username = request.form.get('username')
-        password = request.form.get('password') # Sin hashing (password_plain)
+        password = request.form.get('password')
+        hashed_password = generate_password_hash(password)  # ✅ Hashear la contraseña aquí
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
         email = request.form.get('email')
         phone = request.form.get('phone')
         address = request.form.get('address')
-        dni = request.form.get('dni') # <-- AÑADIDO: Obtener el DNI
-        role = request.form.get('role', 'employee') # Valor por defecto 'employee'
+        dni = request.form.get('dni')
+        role = request.form.get('role', 'employee')
 
-        # Validaciones básicas de campos obligatorios
-        # 'dni' no es obligatorio en la base de datos, así que no se valida aquí a menos que quieras
-        # que sea obligatorio en el formulario.
         if not all([username, password, first_name, last_name, email, role]):
             flash('Por favor, complete todos los campos obligatorios.', 'danger')
             return render_template('register_user.html',
                                    username=username, first_name=first_name,
                                    last_name=last_name, email=email,
-                                   phone=phone, address=address, dni=dni, role=role) # <-- AÑADIDO: pasar dni
+                                   phone=phone, address=address, dni=dni, role=role)
 
         conn = None
         cursor = None
@@ -1785,18 +1783,16 @@ def register_user_view():
                 return render_template('register_user.html',
                                        username=username, first_name=first_name,
                                        last_name=last_name, email=email,
-                                       phone=phone, address=address, dni=dni, role=role) # <-- AÑADIDO: pasar dni
+                                       phone=phone, address=address, dni=dni, role=role)
 
-            # Insertar el nuevo usuario en la base de datos
-            # El orden de las columnas aquí DEBE coincidir con el orden de las variables en la tupla
-            # y con los nombres EXACTOS de las columnas en tu base de datos.
+            # ✅ Usar el hash en lugar de la contraseña en texto plano
             cursor.execute(
-                "INSERT INTO users (username, password_plain, first_name, last_name, email, phone, address, dni, role) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (username, password, first_name, last_name, email, phone, address, dni, role) # <-- AÑADIDO: dni y datetime.now()
+                "INSERT INTO users (username, password_hash, first_name, last_name, email, phone, address, dni, role) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (username, hashed_password, first_name, last_name, email, phone, address, dni, role)
             )
             conn.commit()
             flash('Usuario registrado exitosamente!', 'success')
-            return redirect(url_for('manage_users_view')) # Redirigir a la vista de gestión de usuarios
+            return redirect(url_for('manage_users_view'))
 
         except mysql.connector.Error as err:
             flash(f"Error de base de datos al registrar el usuario: {err}", "danger")
@@ -1810,11 +1806,9 @@ def register_user_view():
             if conn:
                 conn.close()
 
-    # Para solicitudes GET, simplemente muestra el formulario de registro vacío (o con datos si hubo error)
     return render_template('register_user.html',
                            username='', first_name='', last_name='',
-                           email='', phone='', address='', dni='', role='employee') 
-
+                           email='', phone='', address='', dni='', role='employee')
 # --- NUEVA RUTA: OBTENER DATOS DE USUARIO PARA EDICIÓN (AJAX) ---
 @app.route('/get_user_data/<int:user_id>', methods=['GET'])
 def get_user_data(user_id):
@@ -1890,7 +1884,7 @@ def edit_user(user_id):
 
         if new_password:
             # Si hay una nueva contraseña, añadirla a la consulta y a los parámetros
-            set_clauses.append("password_plain = %s") # CORREGIDO: Usar 'password_plain'
+            set_clauses.append("password_hash = %s") 
             params.append(new_password)
 
         query = f"UPDATE users SET {', '.join(set_clauses)} WHERE id = %s"
