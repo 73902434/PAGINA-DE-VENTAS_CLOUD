@@ -1809,6 +1809,7 @@ def register_user_view():
     return render_template('register_user.html',
                            username='', first_name='', last_name='',
                            email='', phone='', address='', dni='', role='employee')
+    
 # --- NUEVA RUTA: OBTENER DATOS DE USUARIO PARA EDICIÓN (AJAX) ---
 @app.route('/get_user_data/<int:user_id>', methods=['GET'])
 def get_user_data(user_id):
