@@ -1168,7 +1168,6 @@ def my_profile_view():
 
         cursor = conn.cursor(dictionary=True) 
         print(f"DEBUG: Ejecutando consulta SQL para user_id: {user_id} (con phone, address, email, DNI)")
-        # *** LÍNEA MODIFICADA: AÑADIDO 'dni' a la selección ***
         cursor.execute("SELECT id, username, first_name, last_name, phone, address, email, dni, role FROM users WHERE id = %s", (user_id,))
         user_info = cursor.fetchone()
         
@@ -1340,18 +1339,15 @@ def update_password():
 
         cursor = conn.cursor(dictionary=True)
         # Obtener la contraseña actual de la DB (¡EN TEXTO PLANO!)
-        # *** CAMBIO AQUÍ: 'password' a 'password_plain' ***
-        cursor.execute("SELECT password_plain FROM users WHERE id = %s", (user_id,))
+        cursor.execute("SELECT password_hash FROM users WHERE id = %s", (user_id,))
         user_data = cursor.fetchone()
 
         # Comparar la contraseña actual proporcionada con la almacenada (¡EN TEXTO PLANO!)
-        # *** CAMBIO AQUÍ: 'password' a 'password_plain' ***
-        if not user_data or user_data['password_plain'] != current_password:
+        if not user_data or user_data['password_hash'] != current_password:
             return jsonify({'success': False, 'message': 'Contraseña actual incorrecta.'}), 400
 
         # Si la contraseña actual es correcta, actualizar con la nueva contraseña (¡EN TEXTO PLANO!)
-        # *** CAMBIO AQUÍ: 'password' a 'password_plain' ***
-        cursor.execute("UPDATE users SET password_plain = %s WHERE id = %s", (new_password, user_id))
+        cursor.execute("UPDATE users SET password_hash = %s WHERE id = %s", (new_password, user_id))
         conn.commit()
 
         return jsonify({'success': True, 'message': 'Contraseña actualizada exitosamente.'}), 200
@@ -1758,7 +1754,7 @@ def register_user_view():
     if request.method == 'POST':
         # Obtener los datos del formulario
         username = request.form.get('username')
-        password = request.form.get('password') # Sin hashing (password_plain)
+        password = request.form.get('password')
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
         email = request.form.get('email')
@@ -1797,7 +1793,7 @@ def register_user_view():
             # El orden de las columnas aquí DEBE coincidir con el orden de las variables en la tupla
             # y con los nombres EXACTOS de las columnas en tu base de datos.
             cursor.execute(
-                "INSERT INTO users (username, password_plain, first_name, last_name, email, phone, address, dni, role) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                "INSERT INTO users (username, password_hash, first_name, last_name, email, phone, address, dni, role) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (username, password, first_name, last_name, email, phone, address, dni, role) # <-- AÑADIDO: dni y datetime.now()
             )
             conn.commit()
@@ -1896,7 +1892,7 @@ def edit_user(user_id):
 
         if new_password:
             # Si hay una nueva contraseña, añadirla a la consulta y a los parámetros
-            set_clauses.append("password_plain = %s") # CORREGIDO: Usar 'password_plain'
+            set_clauses.append("password_hash = %s") 
             params.append(new_password)
 
         query = f"UPDATE users SET {', '.join(set_clauses)} WHERE id = %s"
